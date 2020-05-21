@@ -1,0 +1,17 @@
+{
+	"nextcloud-zimlet-modern": {
+		"title": "Nextcloud",
+		"intro": "Sign into your Nextcloud account to activate this feature. This enables saving email to Nextcloud.",
+		"filename": "Filename",
+		"folderCurrent": "Selected folder",
+		"authButton": "Activate",
+		"saveNextcloud": "Save to Nextcloud",
+		"saveNextcloudDescription": "Choose a folder and filename to store the selected email and it's attachments to Nextcloud.",
+		"SavedOK": "Saved to Nextcloud",
+		"SavedFail": "Failure while saving to Nextcloud",
+		"PropfindFailure": "An error occurred while browsing Nextcloud",
+		"AttachFailure": "An error occurred while attaching from Nextcloud",
+		"NoItems": "No more items found in here."
+      }
+}
+
