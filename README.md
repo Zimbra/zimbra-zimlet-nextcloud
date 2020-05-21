@@ -15,3 +15,7 @@ Also on Nextcloud assuming it run on Apache you must add:
 On Zimbra you need to install wkhtmltopdf be sure to use it from https://wkhtmltopdf.org/downloads.html and not from CentOS  repo (unless you also want to have an X server on your mailbox server)
 
       ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
+
+## Owh no it is realllly slow
+
+Check your bruteforce protection settings in Nextcloud and try a `truncate table bruteforce_attempts`.
