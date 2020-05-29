@@ -1,7 +1,7 @@
 import { createElement, Component, render } from 'preact';
 import { Text, withText } from 'preact-i18n';
 import { withIntl } from '../../enhancers';
-import { ModalDialog, ActionMenuItem, NakedButton } from '@zimbra-client/components';
+import { ActionMenuGroup, ActionMenuItem, NestedActionMenuItem } from '@zimbra-client/components';
 import style from './style';
 import { getDAVPath, getName, getTimeDate, getSize, sanitizeFileName, getParentPath } from '../../utils';
 import RenderPropfind from '../render-propfind';
@@ -18,6 +18,8 @@ import RenderPropfind from '../render-propfind';
     PropfindFailure: 'nextcloud-zimlet-modern.PropfindFailure',
     NoItems: 'nextcloud-zimlet-modern.NoItems',
     AttachFailure: 'nextcloud-zimlet-modern.AttachFailure',
+    attach: 'nextcloud-zimlet-modern.attach',
+    attachInline: 'nextcloud-zimlet-modern.attachInline',
 })
 export default class NextcloudAttacher extends Component {
     constructor(props) {
@@ -27,14 +29,24 @@ export default class NextcloudAttacher extends Component {
     };
 
     //onAttachmentOptionSelection is passed from the Zimlet Slot and allows to add an event handler
-    onAttachFilesFromService = () =>
-        this.props.onAttachmentOptionSelection(this.chooseFilesFromService);
-
-    chooseFilesFromService = (editor) => {
-        this.showDialog(editor);
+    onAttachFilesFromService = (inline) => {
+        if (inline !== true) {
+            this.props.onAttachmentOptionSelection(this.chooseFilesFromService);
+        }
+        else {
+            this.props.onAttachmentOptionSelection(this.chooseFilesFromServiceInline);
+        }
     }
 
-    downloadAndAttachFile = (path, editor) => {
+    chooseFilesFromService = (editor) => {
+        this.showDialog(editor, false);
+    }
+
+    chooseFilesFromServiceInline = (editor) => {
+        this.showDialog(editor, true);
+    }
+
+    downloadAndAttachFile = (path, editor, inline) => {
         let fakeEmailData = {}
         fakeEmailData.nextcloudAction = "get";
         fakeEmailData.nextcloudPath = path;
@@ -50,18 +62,29 @@ export default class NextcloudAttacher extends Component {
                 if (request.status == 200) {
                     // Blob and File are defined per window; We need compatibility with the parent Blob for attachments
                     let file = new window.parent.File([request.response], sanitizeFileName(getName(path)), { type: request.response.type });
-                    editor.addAttachments([file], false);
+
+                    if (inline) {
+                        if (file.type.indexOf('image/') === 0) {
+                            editor.embedImages([file], false);
+                        }
+                        else {
+                            editor.addAttachments([file], false);
+                        }
+                    }
+                    else {
+                        editor.addAttachments([file], false);
+                    }
                 } else {
                     this.alert(this.props.AttachFailure);
                 }
             }
         }.bind(this);
-        request.send(formData);    
+        request.send(formData);
     }
 
-    showDialog = (editor) => {
+    showDialog = (editor, inline) => {
         let display = window.parent.document.getElementsByClassName("zimbra-client_composer_right");
-        let dialog = <div onClick={e => this.DAVItemListClick(e, editor)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll"></div>
+        let dialog = <div onClick={e => this.DAVItemListClick(e, editor, inline)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll"></div>
         display[0].style.minWidth = "600px";
         render(dialog, display[0]);
         this.doPropFind("/");
@@ -92,7 +115,7 @@ export default class NextcloudAttacher extends Component {
         request.send(formData);
     }
 
-    DAVItemListClick = (e, editor) => {
+    DAVItemListClick = (e, editor, inline) => {
         const path = e.target.getAttribute("data-item");
         if (path.slice(-1) == "/") {
             //It's a folder, open it...
@@ -100,7 +123,7 @@ export default class NextcloudAttacher extends Component {
         }
         else {
             //It's a file attach it.
-            this.downloadAndAttachFile(path, editor);
+            this.downloadAndAttachFile(path, editor, inline);
         }
     }
 
@@ -117,9 +140,21 @@ export default class NextcloudAttacher extends Component {
             </span>);
 
         return (
-            <ActionMenuItem icon={childIcon} onClick={this.onAttachFilesFromService}>
-                <Text id="nextcloud-zimlet-modern.title" />
-            </ActionMenuItem>
+            <NestedActionMenuItem
+                anchor="bottom"
+                icon={childIcon}
+                position="right"
+                title={this.props.title}
+            >
+                <ActionMenuGroup>
+                    <ActionMenuItem onClick={() => this.onAttachFilesFromService(false)}>
+                        <Text id="nextcloud-zimlet-modern.attach" />
+                    </ActionMenuItem>
+                    <ActionMenuItem onClick={() => this.onAttachFilesFromService(true)}>
+                        <Text id="nextcloud-zimlet-modern.attachInline" />
+                    </ActionMenuItem>
+                </ActionMenuGroup>
+            </NestedActionMenuItem>
 
         );
     }

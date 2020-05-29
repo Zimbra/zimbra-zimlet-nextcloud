@@ -79,7 +79,40 @@ public class Nextcloud extends ExtensionHttpHandler {
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        resp.getOutputStream().print("com.zimbra.nextcloud is installed.");
+        AuthToken authToken = null;
+        Account account = null;
+        String accessToken = null;
+
+        try {
+            final String cookieString = getFromCookie(req.getCookies(),
+                    ZimbraCookie.authTokenCookieName(false));
+            authToken = getAuthToken(cookieString);
+            account = getAccount(authToken);
+            accessToken = NextCloudTokenHandler.refreshAccessToken(account, "nextcloud");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (req.getParameter("url") != null) {
+
+
+            //work around for cors OPTIONS request not permitted in Nextcloud ATM
+            resp.getOutputStream().print("<!doctype html>");
+            resp.getOutputStream().print("<html lang=\"en\">");
+            resp.getOutputStream().print("<head>");
+            resp.getOutputStream().print("  <meta charset=\"utf-8\">");
+            resp.getOutputStream().print("  <!--ZM-NC-TOKEN-OK-->");
+            resp.getOutputStream().print("</head>");
+            resp.getOutputStream().print("<body><form id=\"ncForm\" action=\"" + req.getParameter("url") + "\" method=\"post\"><input type=\"hidden\" name=\"token\" value=\"" + accessToken + "\"></form>");
+            resp.getOutputStream().print("  <script>");
+            resp.getOutputStream().print("  document.getElementById(\"ncForm\").submit();");
+            resp.getOutputStream().print("</script>");
+            resp.getOutputStream().print("</body>");
+            resp.getOutputStream().print("</html>");
+        } else {
+            resp.getOutputStream().print("com.zimbra.nextcloud is installed.");
+        }
     }
 
     /**
@@ -103,7 +136,6 @@ public class Nextcloud extends ExtensionHttpHandler {
             authToken = getAuthToken(cookieString);
             account = getAccount(authToken);
             accessToken = NextCloudTokenHandler.refreshAccessToken(account, "nextcloud");
-
         } catch (Exception e) {
             e.printStackTrace();
         }

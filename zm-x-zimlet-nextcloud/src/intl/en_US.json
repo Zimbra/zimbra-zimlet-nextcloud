@@ -11,7 +11,10 @@
 		"SavedFail": "Failure while saving to Nextcloud",
 		"PropfindFailure": "An error occurred while browsing Nextcloud",
 		"AttachFailure": "An error occurred while attaching from Nextcloud",
-		"NoItems": "No more items found in here."
+		"NoItems": "No more items found in here.",
+		"attach": "Attach",
+		"attachInline": "Attach inline"
+
       }
 }
 

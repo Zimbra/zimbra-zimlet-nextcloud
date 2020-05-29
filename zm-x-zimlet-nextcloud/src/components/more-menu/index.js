@@ -126,9 +126,12 @@ export default class MoreMenu extends Component {
     }
 
     render() {
+        const childIcon = (
+            <span class={style.appIcon}>
+            </span>);        
         return (
             <div>
-                <ActionMenuItem onClick={this.showDialog}>
+                <ActionMenuItem icon={childIcon} onClick={this.showDialog}>
                     {this.props.title}
                 </ActionMenuItem>
             </div>
