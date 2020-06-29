@@ -16,6 +16,8 @@ On Zimbra you need to install wkhtmltopdf be sure to use it from https://wkhtmlt
 
       ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
 
+You need to compile and install the nextcloud extension jar on the mailbox server. Suggested install location  /opt/zimbra/lib/ext/nextcloud/ and restart mailbox afterwards. You also need to deploy the Zimlet using Zimlet-CLI.
+
 ## Owh no it is realllly slow
 
 Check your bruteforce protection settings in Nextcloud and try a `truncate table bruteforce_attempts`.
@@ -57,3 +59,4 @@ Header set Access-Control-Allow-Methods "GET,POST,HEAD,DELETE,PUT,OPTIONS"
 Header set Access-Control-Allow-Headers "Authorization, OCS-APIRequest"
 
 ```
+
