@@ -2,7 +2,7 @@
 A modern UI Nextcloud Zimlet
 
 See the demo:
-https://github.com/Zimbra/nextcloud-zimlet/releases/download/0.0.1/Nextcloud.Zimlet.Modern.OAuth.mp4
+https://github.com/Zimbra/nextcloud-zimlet/releases/download/0.0.2/20200529.Nextcloud.Zimlet.Modern.mp4
 
 To set up OAuth see: https://github.com/ZimbraOS/zm-oauth-social/wiki/Setting-Up-Nextcloud
 
