@@ -21,7 +21,7 @@ export default function Zimlet(context) {
 
 	const CustomMenuItem = withIntl()(() => (
 		// List of components can be found in zm-x-web, zimlet-manager/shims.js, and more can be added if needed
-		<MenuItem responsive href={`/nextcloud`} className="zimbra-client_menu-item_navItem nextcloud">
+		<MenuItem responsive href={`/nextcloud`}>
 			<span className="zimbra-icon-nextcloud"></span>
 			<b><Text id={'nextcloud-zimlet-modern.title'} /></b>
 		</MenuItem>
