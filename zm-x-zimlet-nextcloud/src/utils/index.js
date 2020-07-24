@@ -2,6 +2,10 @@ export function getDAVPath(context) {
     return context.nextcloudInfo.nextcloud_url.replace('index.php', 'remote.php/webdav');
 };
 
+export function getOCSPath(context) {
+    return context.nextcloudInfo.nextcloud_url.replace('index.php', 'ocs/v1.php/apps/files_sharing/api/v1/shares');
+};
+
 export function getName(path) {
     if (/\/$/.test(path)) {
         path = path.substr(0, path.length - 1);

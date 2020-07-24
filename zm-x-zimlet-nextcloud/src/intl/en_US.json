@@ -13,8 +13,10 @@
 		"AttachFailure": "An error occurred while attaching from Nextcloud",
 		"NoItems": "No more items found in here.",
 		"attach": "Attach",
-		"attachInline": "Attach inline"
-
+		"attachInline": "Attach inline",
+		"attachAsLink" : "Attach as link",
+		"shareLinkPassword": "Password for shared link",
+		"expirationDate": "Expiration date for shared link"
       }
 }
 
