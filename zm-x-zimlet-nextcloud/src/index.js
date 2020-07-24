@@ -39,6 +39,7 @@ export default function Zimlet(context) {
 					//moreMenu stores a Zimlet menu item. We pass context to it here
 					const moreMenu = createMore(context);
 					plugins.register('slot::action-menu-mail-more', moreMenu);
+					plugins.register('slot::attachment-single-action', moreMenu);
 
 					const attacher = createAttacher(context);
 					plugins.register('slot::compose-attachment-action-menu', attacher);
