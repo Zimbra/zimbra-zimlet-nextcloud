@@ -8,7 +8,7 @@ export default class App extends Component {
     };    
 	render() {        
 		return (
-			<iframe class={style.wrapper} src={"/service/extension/nextcloud/?url="+this.zimletContext.nextcloudInfo.nextcloud_url.replace('index.php','zimbra.php')}>
+			<iframe class={style.wrapper} src={this.zimletContext.nextcloudInfo.nextcloud_url}>
 			</iframe>
 		);
 	}
