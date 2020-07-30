@@ -22,34 +22,6 @@ You need to compile and install the nextcloud extension jar on the mailbox serve
 
 Check your bruteforce protection settings in Nextcloud and try a `truncate table bruteforce_attempts`.
 
-## Unstable feature / Tab integration
-
-It is possible to have a Nexctloud tab integration in Zimbra. This uses an undocumented use of the login API of Nextcloud. So it may break in the future. It also needs one PHP file to be added to you Nextcloud installation. This feature can be removed from the zimlet by setting `const enableTabIntegration = false;` in index.js.
-
-Add a file zimbra.php in the same location as where root index.php is on Nextcloud server:
-
-```
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-</head>
-<body>
-  <script>
-xmlhttp=new XMLHttpRequest();
-xmlhttp.open("GET", "index.php");
-xmlhttp.setRequestHeader("OCS-APIRequest","true");
-xmlhttp.setRequestHeader("Authorization","Bearer <?php echo $_POST['token'];?>");
-xmlhttp.onload = function() {
-window.location.href="index.php/apps/files/";
-}
-xmlhttp.send();
-</script>
-</body>
-</html>
-
-```
-
 In addition you need to set up CORS, assuming Apache something like:
 
 ```
