@@ -14,6 +14,8 @@ Also on Nextcloud assuming it run on Apache you must add:
 
 On Zimbra 9 you need to install wkhtmltopdf be sure to use it from https://wkhtmltopdf.org/downloads.html and not from CentOS  repo (unless you also want to have an X server on your mailbox server)
 
+      yum install xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi libjpeg libXrender libXext libX11 fontconfig
+      rpm -i https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox-0.12.6-1.centos7.x86_64.rpm
       ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
 
 You need to compile and install the nextcloud extension jar on the mailbox server. Suggested install location  /opt/zimbra/lib/ext/nextcloud/ and restart mailbox afterwards. You also need to deploy the Zimlet using Zimlet-CLI.
@@ -39,3 +41,4 @@ If you are running Zimbra and Nextcloud on different domains and you see a `Too 
 Header edit Set-Cookie SameSite.* $1
 ```
 Please note that this will remove the SameSite Cookie policy, do this only if you understand what it does and if you have no other option. See: https://web.dev/samesite-cookies-explained/
+
