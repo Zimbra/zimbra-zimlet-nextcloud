@@ -74,12 +74,9 @@ export default class MoreMenu extends Component {
 
         let filename = "";
         let readonly = false;
-        if (this._props.emailData.slot == "attachment-single-action") {
-            filename = (sanitizeFileName(this._props.emailData.subject) || this._props.emailData.id);
+        filename = (sanitizeFileName(this._props.emailData.subject) || this._props.emailData.id);
+        if (this._props.emailData.slot == "attachment-single-action") {            
             readonly = true;
-        }
-        else {
-            filename = (sanitizeFileName(this._props.emailData.subject) || this._props.emailData.id) + '.pdf';
         }
 
         this.modal = (

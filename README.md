@@ -12,7 +12,7 @@ Also on Nextcloud assuming it run on Apache you must add:
       RewriteCond %{HTTP:Authorization} ^(.*)
       RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 
-On Zimbra you need to install wkhtmltopdf be sure to use it from https://wkhtmltopdf.org/downloads.html and not from CentOS  repo (unless you also want to have an X server on your mailbox server)
+On Zimbra 9 you need to install wkhtmltopdf be sure to use it from https://wkhtmltopdf.org/downloads.html and not from CentOS  repo (unless you also want to have an X server on your mailbox server)
 
       ln -s /usr/local/bin/wkhtmltopdf /bin/wkhtmltopdf
 
@@ -32,3 +32,10 @@ Header set Access-Control-Allow-Headers "Authorization, OCS-APIRequest"
 
 ```
 
+## The Nextcloud tab in Zimbra does not work
+
+If you are running Zimbra and Nextcloud on different domains and you see a `Too many redirects` error in the tab you should add/configure the following http header. Assuming you are running Nextcloud on Apache:
+```
+Header edit Set-Cookie SameSite.* $1
+```
+Please note that this will remove the SameSite Cookie policy, do this only if you understand what it does and if you have no other option. See: https://web.dev/samesite-cookies-explained/
