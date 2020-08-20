@@ -32,8 +32,17 @@ export default class MoreMenu extends Component {
             this._props.emailData = {};
             this._props.emailData.attachments = [];
             this._props.emailData.attachments[0] = this._props.attachment;
-            this._props.emailData.subject = this._props.attachment.filename;
+            this._props.emailData.subject = this._props.attachment.filename; //the file name is not really used by the back-end
             this._props.emailData.id = "skip";
+            this._props.emailData.slot = "attachment-single-action";
+        }
+        else if (this._props.attachments) {
+            this._props.emailData = {};
+            this._props.emailData.attachments = [];
+            this._props.emailData.attachments = this._props.attachments;
+            this._props.emailData.subject = this._props.attachments[0].filename; //the file name is not really used by the back-end
+            this._props.emailData.id = "skip";
+            //technically I am lying as this is the attachment-multi-action slot, but it needs to do the same thing so:
             this._props.emailData.slot = "attachment-single-action";
         }
         else {

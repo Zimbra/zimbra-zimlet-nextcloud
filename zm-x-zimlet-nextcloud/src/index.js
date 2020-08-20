@@ -17,7 +17,7 @@ export default function Zimlet(context) {
 	//Get the 'plugins' object from context and define it in the current scope
 	const { plugins } = context;
 	const exports = {};
-	const enableTabIntegration = true;
+	const enableTabIntegration = false;
 
 	const CustomMenuItem = withIntl()(() => (
 		// List of components can be found in zm-x-web, zimlet-manager/shims.js, and more can be added if needed
@@ -40,6 +40,7 @@ export default function Zimlet(context) {
 					const moreMenu = createMore(context);
 					plugins.register('slot::action-menu-mail-more', moreMenu);
 					plugins.register('slot::attachment-single-action', moreMenu);
+					plugins.register('slot::attachment-multi-action', moreMenu);
 
 					const attacher = createAttacher(context);
 					plugins.register('slot::compose-attachment-action-menu', attacher);
