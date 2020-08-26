@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "nextcloud",
+  "name": "zimbra-zimlet-nextcloud",
   "version": "1.0.0",
   "license": "MIT",
   "description": "TBD",
