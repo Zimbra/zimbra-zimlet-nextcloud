@@ -28,7 +28,7 @@ create-zip:
 	npm run package
 
 stage-zimlet-zip:
-	install -T -D $(WORKSPACE)/$(NAME).zip  build/stage/$(NAME)/opt/zimbra/zimlets-network/$(NAME).zip
+	install -T -D $(WORKSPACE)/zm-x-zimlet-nextcloud.zip  build/stage/$(NAME)/opt/zimbra/zimlets-network/zm-x-zimlet-nextcloud.zip
 
 zimbra-zimlet-pkg: stage-zimlet-zip
 	../../zm-pkg-tool/pkg-build.pl \
@@ -39,7 +39,7 @@ zimbra-zimlet-pkg: stage-zimlet-zip
 		--pkg-summary="$(DESC)" \
 		--pkg-depends='zimbra-network-store (>= 9.0.0)' \
 		--pkg-post-install-script='scripts/postinst.sh'\
-		--pkg-installs='/opt/zimbra/zimlets-network/$(NAME).zip'
+		--pkg-installs='/opt/zimbra/zimlets-network/zm-x-zimlet-nextcloud.zip'
 
 ########################################################################################################
 
