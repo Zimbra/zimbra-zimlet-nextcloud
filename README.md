@@ -33,21 +33,3 @@ You need to compile and install the nextcloud extension jar on the mailbox serve
 
 Check your bruteforce protection settings in Nextcloud and try a `truncate table bruteforce_attempts`.
 
-In addition you need to set up CORS, assuming Apache something like:
-
-```
-Header set Content-Security-Policy "frame-ancestors 'self' zimbra.example.com;"
-Header set Access-Control-Allow-Origin "https://zimbra.example.com"
-Header set Access-Control-Allow-Methods "GET,POST,HEAD,DELETE,PUT,OPTIONS"
-Header set Access-Control-Allow-Headers "Authorization, OCS-APIRequest"
-
-```
-
-## The Nextcloud tab in Zimbra does not work
-
-If you are running Zimbra and Nextcloud on different domains and you see a `Too many redirects` error in the tab you should add/configure the following http header. Assuming you are running Nextcloud on Apache:
-```
-Header edit Set-Cookie SameSite.* $1
-```
-Please note that this will remove the SameSite Cookie policy, do this only if you understand what it does and if you have no other option. See: https://web.dev/samesite-cookies-explained/
-
