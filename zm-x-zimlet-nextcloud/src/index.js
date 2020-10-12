@@ -55,13 +55,24 @@ export default function Zimlet(context) {
 				});
 			});
 
+		// Create a main nav menu item.
+		const CustomTabItemInner = () => {
+			const childIcon = (
+				<span class="zimbra-icon-nextcloud">
+				</span>);
+			return (
+				<MenuItem icon={childIcon} responsive href={`/cloudapps/ncauthorize`}>
+					Nextcloud
+				</MenuItem>
+			);
+		};
 
-		plugins.register('settings', {
-			id: 'com_zimbra_x-nextcloud',
-			title: 'Nextcloud',
-			component: NextcloudSettingsPanel
-		});
-
+		const CustomTabItem = withIntl()(CustomTabItemInner);
+		plugins.register(`slot::cloudapps-tab-item`, CustomTabItem);
+		plugins.register("slot::routes", RouteCloudApps);
+		function RouteCloudApps() {
+			return [<NextcloudSettingsPanel path={`/cloudapps/ncauthorize`}>{{context}}</NextcloudSettingsPanel>];
+		}
 	};
 
 	return exports;

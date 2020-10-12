@@ -11,7 +11,7 @@ export default class NextcloudSettingsPanel extends Component {
 
 	render() {
 		return (
-			<div>
+			<div style="margin-left:10px">
 				<h1 class={style.heading}>
 					
 					<span>
