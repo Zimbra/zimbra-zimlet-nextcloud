@@ -24,7 +24,6 @@ all: zimbra-zimlet-pkg
 
 download:
 	mkdir downloads
-	wget -O downloads/zm-x-zimlet-nextcloud.zip https://files.zimbra.com/downloads/nextcloud/9.0.0.p8/zm-x-zimlet-nextcloud.zip
 	wget -O downloads/zm-nextcloud-extension.jar https://files.zimbra.com/downloads/nextcloud/9.0.0.p7/zm-nextcloud-extension.jar
 
 create-zip:
@@ -33,17 +32,16 @@ create-zip:
 	npm run package
 
 stage-zimlet-zip:
-	install -T -D $(WORKSPACE)/zm-x-zimlet-nextcloud.zip  build/stage/$(NAME)/opt/zimbra/zimlets-network/zm-x-zimlet-nextcloud.zip
+	install -T -D pkg/$(NAME).zip build/stage/$(NAME)/opt/zimbra/zimlets-network/zm-x-zimlet-nextcloud.zip
+	install -T -D downloads/zm-nextcloud-extension.jar build/stage/$(NAME)/opt/zimbra/lib/ext/nextcloud/zm-nextcloud-extension.jar
 
-zimbra-zimlet-pkg: download
-	install -T -D downloads/zm-x-zimlet-nextcloud.zip  build/stage/zimbra-zimlet-nextcloud/opt/zimbra/zimlets-network/zm-x-zimlet-nextcloud.zip
-	install -T -D downloads/zm-nextcloud-extension.jar build/stage/zimbra-zimlet-nextcloud/opt/zimbra/lib/ext/nextcloud/zm-nextcloud-extension.jar
+zimbra-zimlet-pkg: download create-zip stage-zimlet-zip
 	../../zm-pkg-tool/pkg-build.pl \
 		--out-type=binary \
 		--pkg-version=$(VERSION).$(shell git log --pretty=format:%ct -1) \
 		--pkg-release=1 \
 		--pkg-name=$(NAME) \
-		--pkg-summary="$(DESC)" \
+		--pkg-summary='$(DESC)' \
 		--pkg-depends='zimbra-network-store (>= 9.0.0)' \
 		--pkg-post-install-script='scripts/postinst.sh'\
 		--pkg-installs='/opt/zimbra/lib/ext/nextcloud/zm-nextcloud-extension.jar' \
@@ -54,6 +52,6 @@ zimbra-zimlet-pkg: download
 clean:
 	rm -rf build
 	rm -rf downloads
+	rm -rf pkg
 
 ########################################################################################################
-
