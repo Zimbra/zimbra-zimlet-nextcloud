@@ -22,7 +22,7 @@ export default class NextcloudSettingsPanel extends Component {
 					<Text id={'nextcloud-zimlet-modern.intro'} />
 				</p>
 				<p>
-                <button type="button" onClick={this.openPage('/service/extension/oauth2/authorize/nextcloud?type=noop')} class="blocks_button blocks_button_primary blocks_button_regular blocks_button_brand-primary"><Text id={'nextcloud-zimlet-modern.authButton'} /></button>
+                <button type="button" onClick={this.openPage('/service/extension/oauth2/authorize/nextcloud?type=noop')} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button"><Text id={'nextcloud-zimlet-modern.authButton'} /></button>
 				</p>
 			</div>
 		);
