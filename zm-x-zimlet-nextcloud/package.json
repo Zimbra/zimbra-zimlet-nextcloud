@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "nextcloud",
-  "version": "1.0.0",
+  "name": "zimbra-zimlet-nextcloud",
+  "version": "1.0.2",
   "license": "MIT",
-  "description": "TBD",
+  "description": "Nextcloud Zimlet",
   "main": "build/index.js",
   "module": "src/index.js",
   "scripts": {
