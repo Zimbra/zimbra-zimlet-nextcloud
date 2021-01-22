@@ -1,4 +1,4 @@
-# nextcloud-zimlet
+# Zimbra Nextcloud Zimlet
 A modern UI Nextcloud Zimlet
 
 See the demo:
