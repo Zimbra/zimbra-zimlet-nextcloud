@@ -33,3 +33,6 @@ You need to compile and install the nextcloud extension jar on the mailbox serve
 
 Check your bruteforce protection settings in Nextcloud and try a `truncate table bruteforce_attempts`.
 
+## Zimbra Nextcloud Java extension
+
+Nextcloud extension moved to it's own repo at: https://github.com/Zimbra/zm-nextcloud-extension
