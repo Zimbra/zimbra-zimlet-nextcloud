@@ -27,6 +27,14 @@ export default class MoreMenu extends Component {
         //zimlet slots have inconsistent prop names, we copy all props to _props and make them consistent
         this._props = this.props;
 
+        //A conversation is selected, take newest message
+        try {
+           if(Array.isArray(this._props.emailData.messages))
+           {
+              this._props.emailData = this._props.emailData.messages[0];
+           }
+        } catch(err){}//ignore
+
         //Invoked from slot attachment-single-action
         if (this._props.attachment) {
             this._props.emailData = {};
