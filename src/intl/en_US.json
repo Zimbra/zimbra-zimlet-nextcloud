@@ -1,10 +1,12 @@
 {
 	"nextcloud-zimlet-modern": {
 		"title": "Nextcloud",
-		"intro": "Sign into your Nextcloud account to activate this feature. This enables saving email to Nextcloud.",
+		"intro": "Connect your Nextcloud account to: Share files via a Nextcloud link, save attachments to Nextcloud and attach files from Nextcloud.",
+		"outro": "Click Deactivate to stop using the connected Nextcloud account from within Zimbra.",
 		"filename": "Filename",
 		"folderCurrent": "Selected folder",
-		"authButton": "Activate",
+		"activateButton": "Activate",
+		"deactivateButton": "Deactivate",
 		"saveNextcloud": "Save to Nextcloud",
 		"saveNextcloudDescription": "Choose a folder and filename to store the selected email and it's attachments to Nextcloud.",
 		"SavedOK": "Saved to Nextcloud",

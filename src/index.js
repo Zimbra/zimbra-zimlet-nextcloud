@@ -29,27 +29,28 @@ export default function Zimlet(context) {
 
 	exports.init = function init() {
 		const oauthClient = new OAuthClient(context);
-
+		//moreMenu stores a Zimlet menu item. We pass context to it here
+		const moreMenu = createMore(context);
+		const attacher = createAttacher(context);
 
 		oauthClient.getInfo('nextcloud')
 			.then(info => {
 				context.nextcloudInfo = info;
 
 				oauthClient.getCredentials('nextcloud').then(credentials => {
-					//moreMenu stores a Zimlet menu item. We pass context to it here
-					const moreMenu = createMore(context);
-					plugins.register('slot::action-menu-mail-more', moreMenu);
-					plugins.register('slot::attachment-single-action', moreMenu);
-					plugins.register('slot::attachment-multi-action', moreMenu);
+					if (credentials[0]) {
+						plugins.register('slot::action-menu-mail-more', moreMenu);
+						plugins.register('slot::attachment-single-action', moreMenu);
+						plugins.register('slot::attachment-multi-action', moreMenu);
+						plugins.register('slot::compose-attachment-action-menu', attacher);
 
-					const attacher = createAttacher(context);
-					plugins.register('slot::compose-attachment-action-menu', attacher);
-
-					if (enableTabIntegration) {
-						plugins.register("slot::menu", CustomMenuItem);
-						plugins.register("slot::routes", Router);
-						function Router() {
-							return [<App path={`/nextcloud`}>{{context}}</App>];
+						if (enableTabIntegration) {
+							//this has not been tested in a while, enableTabIntegration has been hardcoded to false for a while 
+							plugins.register("slot::menu", CustomMenuItem);
+							plugins.register("slot::routes", Router);
+							function Router() {
+								return [<App path={`/nextcloud`}>{{ context }}</App>];
+							}
 						}
 					}
 				});
@@ -71,7 +72,7 @@ export default function Zimlet(context) {
 		plugins.register(`slot::cloudapps-tab-item`, CustomTabItem);
 		plugins.register("slot::routes", RouteCloudApps);
 		function RouteCloudApps() {
-			return [<NextcloudSettingsPanel path={`/cloudapps/ncauthorize`}>{{context}}</NextcloudSettingsPanel>];
+			return [<NextcloudSettingsPanel path={`/cloudapps/ncauthorize`}>{{ context, moreMenu, attacher }}</NextcloudSettingsPanel>];
 		}
 	};
 
