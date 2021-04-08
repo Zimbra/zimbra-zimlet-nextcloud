@@ -113,7 +113,7 @@ export default class NextcloudAttacher extends Component {
 
     showDialog = (editor, attachType) => {
         let display = window.parent.document.getElementsByClassName("zimbra-client_composer_right");
-        let dialog = <div><div id="shareLinkOptions" style="margin:5px;margin-bottom:15px"><input id="linkSharePassword" placeholder={this.props.shareLinkPassword} value=""></input> {this.props.expirationDate} : <input type="date" id="expirationDate" name="expirationDate"  value=""></input></div><div onClick={e => this.DAVItemListClick(e, editor, attachType)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll"></div></div>
+        let dialog = <div><div id="shareLinkOptions" style="margin:5px;margin-bottom:15px"><input id="linkSharePassword" placeholder={this.props.shareLinkPassword} value=""></input> {this.props.expirationDate} : <input type="date" id="expirationDate" name="expirationDate"  value=""></input></div><div onClick={e => this.DAVItemListClick(e, editor, attachType)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll; height:100%"></div></div>
         display[0].style.minWidth = "600px";
         render(dialog, display[0]);
         if (attachType == "attachAsLink") {

@@ -19,17 +19,18 @@ const RenderPropfind = props => {
     });
 
     return (
-        <div>
-            <table><tr>
-                <td className={style.homeIcon} data-item="/" title="home folder"></td>
-                <td className={style.upIcon} data-item={getParentPath(props.path, "/")} title="parent folder"></td>
-            </tr></table>
-            <hr className={style.itemListHr} />
-            <table className={style.itemTable} data-text={props.emptyMsg}>
+       <div style="display: block; width:100%">
+          <div style="position: fixed; background-color:#f2f2f2; width:92%;border-bottom:1px solid #cccccc">
+             <button className={style.homeIcon} data-item="/" title="home folder"/>
+             <button className={style.upIcon} data-item={getParentPath(props.path, "/")} title="parent folder"/>
+          </div>
+          <div style="display: block; height: 100%; overflow-y: scroll;padding-top:22px">
+             <table style="display: block;" className={style.itemTable} data-text={props.emptyMsg}>
                 {items}
-            </table>
-            <hr className={style.itemListHr} />
-        </div>
+             </table>
+             <hr className={style.itemListHr} />
+          </div>
+       </div>
     );
 };
 
