@@ -23,6 +23,7 @@ import RenderPropfind from '../render-propfind';
     attachAsLink: 'nextcloud-zimlet-modern.attachAsLink',
     shareLinkPassword: 'nextcloud-zimlet-modern.shareLinkPassword',
     expirationDate: 'nextcloud-zimlet-modern.expirationDate',
+    plainTextShareLink: 'nextcloud-zimlet-modern.plainTextShareLink',
 })
 export default class NextcloudAttacher extends Component {
     constructor(props) {
@@ -85,7 +86,16 @@ export default class NextcloudAttacher extends Component {
                     if (attachType == "attachAsLink") {
                         let OCSResponse = JSON.parse(request.responseText);
                         OCSResponse.text = getName(path);
-                        editor.insertLinksAtCaret([OCSResponse]);
+                        if(!editor.isPlainText())
+                        {
+                           editor.insertLinksAtCaret([OCSResponse]);
+                        }
+                        else
+                        {
+                           //https://github.com/ZimbraOS/zm-x-web/blob/1a6ae45704a6e189dd859a22ed802aac150c694d/src/components/composer/composer.js#L990
+                           //InsertAt... not supported in plain text compose mode
+                           window.prompt(this.props.plainTextShareLink,OCSResponse.url);
+                        }
                     }
                     else {
                         // Blob and File are defined per window; We need compatibility with the parent Blob for attachments

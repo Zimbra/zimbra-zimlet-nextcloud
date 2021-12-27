@@ -18,7 +18,8 @@
 		"attachInline": "Attach inline",
 		"attachAsLink" : "Attach as link",
 		"shareLinkPassword": "Password for shared link",
-		"expirationDate": "Expiration date for shared link"
-      }
+		"expirationDate": "Expiration date for shared link",
+		"plainTextShareLink":"Copy and paste the share link to your email"
+		}
 }
 
