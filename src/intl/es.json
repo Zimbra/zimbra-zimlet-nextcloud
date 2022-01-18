@@ -1,0 +1,24 @@
+{
+	"nextcloud-zimlet-modern": {
+		"title": "Nextcloud",
+		"intro": "Conecta tu cuenta Nextcloud para: Compartir ficheros y documentos mediante un enlace de Nextcloud, guardar adjuntos en Nextcloud y adjuntar ficheros desde Nextcloud.",
+		"outro": "Pulsa en Desactivar para quitar el acceso a tu cuenta de Nextcloud desde Zimbra.",
+		"filename": "Nombre del fichero",
+		"folderCurrent": "Carpeta seleccionada",
+		"activateButton": "Activar",
+		"deactivateButton": "Desactivar",
+		"saveNextcloud": "Guardar en Nextcloud",
+		"saveNextcloudDescription": "Elije la carpeta y el nombre del fichero para almacenar el correo y los adjuntos en Nextcloud.",
+		"SavedOK": "Guardar en Nextcloud",
+		"SavedFail": "Ha ocurrido un fallo y no hemos podido guardar el archivo en Nextcloud",
+		"PropfindFailure": "Parece que no puedo acceder a tus carpetas de Nextcloud, por favor revisa la configuración y asegúrate que Nextcloud es accesible",
+		"AttachFailure": "Ha ocurrido un fallo mientras adjuntaba desde Nextcloud",
+		"NoItems": "No se han encontrado mas ficheros aquí.",
+		"attach": "Adjuntar",
+		"attachInline": "Adjuntar dentro del correo",
+		"attachAsLink": "Adjuntarlo como un enlace",
+		"shareLinkPassword": "Contraseña para el enlace compartido",
+		"expirationDate": "Fecha de expiración del enlace compartido",
+		"plainTextShareLink": "Copiar y pegar el enlace compartido en el correo"
+	}
+}
