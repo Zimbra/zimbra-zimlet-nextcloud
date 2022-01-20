@@ -1,0 +1,24 @@
+{
+	"nextcloud-zimlet-modern": {
+		"title": "Nextcloud",
+		"intro": "Connecteu el vostre compte de Nextcloud a: compartir fitxers mitjançant un enllaç Nextcloud, desar fitxers adjunts a Nextcloud i adjuntar fitxers des de Nextcloud.",
+		"outro": "Feu clic a Desactiva per deixar d'utilitzar el compte Nextcloud connectat des de Zimbra.",
+		"filename": "Nom del fitxer",
+		"folderCurrent": "Carpeta seleccionada",
+		"activateButton": "Activa",
+		"deactivateButton": "Desactiva",
+		"saveNextcloud": "Desa a Nextcloud",
+		"saveNextcloudDescription": "Trieu una carpeta i un nom de fitxer per emmagatzemar el correu electrònic seleccionat i els seus fitxers adjunts a Nextcloud.",
+		"SavedOK": "Desat a Nextcloud",
+		"SavedFail": "Error en desar a Nextcloud",
+		"PropfindFailure": "S'ha produït un error en navegar per Nextcloud",
+		"AttachFailure": "S'ha produït un error en connectar des de Nextcloud",
+		"NoItems": "No s'han trobat més elements aquí.",
+		"attach": "Adjuntar",
+		"attachInline": "Adjunta en línia",
+		"attachAsLink": "Adjunta com a enllaç",
+		"shareLinkPassword": "Contrasenya per a l'enllaç compartit",
+		"expirationDate": "Data de caducitat de l'enllaç compartit",
+		"plainTextShareLink": "Copieu i enganxeu l'enllaç per compartir al vostre correu electrònic"
+	}
+}
