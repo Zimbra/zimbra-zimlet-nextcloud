@@ -1,0 +1,24 @@
+{
+	"nextcloud-zimlet-modern": {
+		"title": "Nextcloud",
+		"intro": "Verbinden Sie Ihr Nextcloud-Konto, um Dateien über einen Nextcloud-Link zu teilen, Anhänge in Nextcloud zu speichern und Dateien aus Nextcloud anzuhängen.",
+		"outro": "Klicken Sie auf „Deaktivieren“, um das verbundene Nextcloud-Konto nicht mehr innerhalb von Zimbra zu nutzen.",
+		"filename": "Dateiname",
+		"folderCurrent": "Ausgewählter Ordner",
+		"activateButton": "Aktivieren",
+		"deactivateButton": "Deaktivieren",
+		"saveNextcloud": "In Nextcloud speichern",
+		"saveNextcloudDescription": "Wählen Sie einen Ordner und einen Dateinamen, um die ausgewählte E-Mail und die Anhänge in Nextcloud zu speichern.",
+		"SavedOK": "In Nextcloud gespeichert",
+		"SavedFail": "Fehler beim Speichern in Nextcloud",
+		"PropfindFailure": "Beim Durchsuchen von Nextcloud ist ein Fehler aufgetreten",
+		"AttachFailure": "Beim Anhängen aus Nextcloud ist ein Fehler aufgetreten",
+		"NoItems": "Keine weiteren Elemente gefunden.",
+		"attach": "Datei anhängen",
+		"attachInline": "Datei einbetten",
+		"attachAsLink": "Als Link anhängen",
+		"shareLinkPassword": "Passwort für geteilten Link",
+		"expirationDate": "Ablaufdatum für geteilten Link",
+		"plainTextShareLink": "Geteilten Link kopieren und in Ihre Mail einfügen"
+	}
+}
