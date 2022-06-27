@@ -1,18 +1,16 @@
-# Zimbra Nextcloud Zimlet
-A modern UI Nextcloud Zimlet
+# Zimbra Nextcloud Zimlet fo modern UI
 
-See the demo:
-https://github.com/Zimbra/nextcloud-zimlet/releases/download/0.0.2/20200529.Nextcloud.Zimlet.Modern.mp4
+With the Nextcloud Zimlet you can add files from Nextcloud to emails as attachments, links and inline images. You can also store emails and attachments from Zimbra to Nextcloud.
 
-To set up OAuth see: https://github.com/ZimbraOS/zm-oauth-social/wiki/Setting-Up-Nextcloud
+This Zimlet is in the official repos and can be installed via:
 
-Also on Nextcloud assuming it run on Apache you must add:
+      yum install zimbra-zimlet-nextcloud
+      apt install  zimbra-zimlet-nextcloud
 
-      RewriteEngine On
-      RewriteCond %{HTTP:Authorization} ^(.*)
-      RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 
-You need to compile and install the nextcloud extension jar on the mailbox server. Suggested install location  /opt/zimbra/lib/ext/nextcloud/ and restart mailbox afterwards. You also need to deploy the Zimlet using Zimlet-CLI.
+## Install instructions
+
+See: https://zimbra.github.io/zimbra-9/adminguide.html#_setting_up_nextcloud
 
 ## Owh no it is realllly slow
 
