@@ -1,0 +1,141 @@
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@3.0.0
+
+############################################################################
+
+references:
+   checkout_job_steps: &checkout_job_steps
+      steps:
+         - checkout
+         - run: 
+            name: Checking out dependencies
+            command: |
+               git clone https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
+         - persist_to_workspace:
+            root: ..
+            paths:
+               - zimbra-zimlet-nextcloud
+               - zm-pkg-tool
+
+   build_job_steps: &build_job_steps
+      steps:
+         - attach_workspace:
+            at: ..
+         - run:
+            name: Creating build
+            command: make
+         - store_artifacts:
+            path: build/
+         - persist_to_workspace:
+            root: ..
+            paths: zimbra-zimlet-nextcloud/build/*
+
+
+   deploy_s3_job_steps: &deploy_s3_job_steps
+      docker:
+      - image: 'cimg/python:3.10'
+      steps:
+         - attach_workspace:
+            at: ..
+         - aws-s3/sync:
+            from: 'build/'
+            to: 's3://files.zimbra.com/dev-releases/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH-$CIRCLE_BUILD_NUM/archives/zimbra-zimlet-nextcloud/'
+            aws-access-key-id: RELEASE_AWS_ACCESS_KEY_ID
+            aws-secret-access-key: RELEASE_AWS_SECRET_ACCESS_KEY
+            aws-region: RELEASE_AWS_DEFAULT_REGION
+            arguments: --acl public-read
+
+############################################################################
+
+jobs:
+   checkout:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:core-ubuntu
+      <<: *checkout_job_steps
+
+   build_u20:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:devcore-ubuntu-20.04
+      <<: *build_job_steps
+
+   build_u18:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:devcore-ubuntu-18.04
+      <<: *build_job_steps
+
+   build_u16:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:devcore-ubuntu-16.04
+      <<: *build_job_steps
+
+   build_c8:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:devcore-centos-8
+      <<: *build_job_steps
+
+   build_c7:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:devcore-centos-7
+      <<: *build_job_steps
+
+   deploy_s3:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: zimbra/zm-base-os:core-ubuntu
+      <<: *deploy_s3_job_steps
+
+############################################################################
+
+workflows:
+   version: 2
+   main:
+      jobs:
+         - build:
+            type: approval
+         - checkout:
+            requires:
+              - build
+         - build_u20:
+            requires:
+               - checkout
+         - build_u18:
+            requires:
+               - checkout
+         - build_u16:
+            requires:
+               - checkout
+         - build_c8:
+            requires:
+               - checkout
+         - build_c7:
+            requires:
+               - checkout
+
+         - deploy_s3_hold:
+            type: approval
+            requires:
+               - build_u20
+               - build_u18
+               - build_u16
+               - build_c8
+               - build_c7
+
+         - deploy_s3:
+            context:
+               - aws
+            requires:
+               - deploy_s3_hold
