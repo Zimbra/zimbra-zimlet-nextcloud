@@ -37,7 +37,7 @@ stage-zimlet-zip:
 	install -T -D downloads/zm-nextcloud-extension.jar build/stage/$(NAME)/opt/zimbra/lib/ext/nextcloud/zm-nextcloud-extension.jar
 
 zimbra-zimlet-pkg: download stage-zimlet-zip
-	../../zm-pkg-tool/pkg-build.pl \
+	../zm-pkg-tool/pkg-build.pl \
 		--out-type=binary \
 		--pkg-version=1.0.8.$(shell git log --pretty=format:%ct -1) \
 		--pkg-release=1 \
