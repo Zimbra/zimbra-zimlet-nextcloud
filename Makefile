@@ -39,7 +39,7 @@ stage-zimlet-zip:
 zimbra-zimlet-pkg: download stage-zimlet-zip
 	../zm-pkg-tool/pkg-build.pl \
 		--out-type=binary \
-		--pkg-version=1.0.8.$(shell git log --pretty=format:%ct -1) \
+		--pkg-version=1.0.9.$(shell git log --pretty=format:%ct -1) \
 		--pkg-release=1 \
 		--pkg-name=$(NAME) \
 		--pkg-summary='$(DESC)' \
