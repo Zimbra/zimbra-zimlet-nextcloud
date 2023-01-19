@@ -20,6 +20,10 @@
 		"shareLinkPassword": "Password for shared link",
 		"expirationDate": "Expiration date for shared link",
 		"plainTextShareLink":"Copy and paste the share link to your email"
-	}
+	},
+	"zimlet": {
+		"description": "Nextcloud integration for Zimbra",
+		"label": "Nextcloud"
+  }
 }
 
