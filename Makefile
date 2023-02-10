@@ -24,7 +24,7 @@ all: zimbra-zimlet-pkg
 
 download:
 	mkdir downloads
-	wget -O downloads/zm-nextcloud-extension.jar https://files.zimbra.com/downloads/nextcloud/9.0.0.p7/zm-nextcloud-extension.jar
+	wget -O downloads/zm-nextcloud-extension.jar https://files.zimbra.com/downloads/nextcloud/9.0.0.p26/zm-nextcloud-extension.jar
 	wget -O downloads/zimbra-zimlet-nextcloud.zip https://files.zimbra.com/downloads/nextcloud/9.0.0.p26/zimbra-zimlet-nextcloud.zip
 
 create-zip:
@@ -39,7 +39,7 @@ stage-zimlet-zip:
 zimbra-zimlet-pkg: download stage-zimlet-zip
 	../zm-pkg-tool/pkg-build.pl \
 		--out-type=binary \
-		--pkg-version=1.0.9.$(shell git log --pretty=format:%ct -1) \
+		--pkg-version=1.0.10.$(shell git log --pretty=format:%ct -1) \
 		--pkg-release=1 \
 		--pkg-name=$(NAME) \
 		--pkg-summary='$(DESC)' \
