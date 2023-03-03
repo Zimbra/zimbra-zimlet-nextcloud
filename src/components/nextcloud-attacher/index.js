@@ -1,7 +1,7 @@
 import { createElement, Component, render } from 'preact';
 import { Text, withText } from 'preact-i18n';
 import { withIntl } from '../../enhancers';
-import { ActionMenuGroup, ActionMenuItem, NestedActionMenuItem } from '@zimbra-client/components';
+import { ModalDialog, ActionMenuGroup, ActionMenuItem, NestedActionMenuItem } from '@zimbra-client/components';
 import style from './style';
 import { getOCSPath, getDAVPath, getName, getTimeDate, getSize, sanitizeFileName, getParentPath } from '../../utils';
 import RenderPropfind from '../render-propfind';
@@ -24,6 +24,9 @@ import RenderPropfind from '../render-propfind';
     shareLinkPassword: 'nextcloud-zimlet-modern.shareLinkPassword',
     expirationDate: 'nextcloud-zimlet-modern.expirationDate',
     plainTextShareLink: 'nextcloud-zimlet-modern.plainTextShareLink',
+    attachFromNextcloud: 'nextcloud-zimlet-modern.attachFromNextcloud',
+    attachedOK: 'nextcloud-zimlet-modern.attachedOK',
+    linkInserted: 'nextcloud-zimlet-modern.linkInserted'
 })
 export default class NextcloudAttacher extends Component {
     constructor(props) {
@@ -89,6 +92,7 @@ export default class NextcloudAttacher extends Component {
                         if(!editor.isPlainText())
                         {
                            editor.insertLinksAtCaret([OCSResponse]);
+                           this.alert(this.props.linkInserted);
                         }
                         else
                         {
@@ -112,6 +116,7 @@ export default class NextcloudAttacher extends Component {
                         else if (attachType == "attach") {
                             editor.addAttachments([file], false);
                         }
+                        this.alert(this.props.attachedOK);
                     }
                 } else {
                     this.alert(this.props.AttachFailure);
@@ -122,18 +127,50 @@ export default class NextcloudAttacher extends Component {
     }
 
     showDialog = (editor, attachType) => {
-        let display = window.parent.document.getElementsByClassName("zimbra-client_composer_right");
-        let dialog = <div><div id="shareLinkOptions" style="margin:5px;margin-bottom:15px"><input id="linkSharePassword" placeholder={this.props.shareLinkPassword} value=""></input> {this.props.expirationDate} : <input type="date" id="expirationDate" name="expirationDate"  value=""></input></div><div onClick={e => this.DAVItemListClick(e, editor, attachType)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll; height:100%"></div></div>
-        display[0].style.minWidth = "600px";
-        render(dialog, display[0]);
-        if (attachType == "attachAsLink") {
-            window.parent.document.getElementById("shareLinkOptions").style.display = "block";
-            window.parent.document.getElementById("expirationDate").min = (new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).toISOString().slice(0,10);
+        const minDate = (new Date(Date.now() + 1 * 24 * 60 * 60 * 1000)).toISOString().slice(0,10);
+
+        switch (attachType) {
+           case 'attach':
+              this.modalTitle = this.props.attachFromNextcloud;
+              this.displayShareLinkOptions = "none";
+              break;
+           case 'attachInline':
+              this.modalTitle = this.props.attachInline
+              this.displayShareLinkOptions = "none";
+              break;
+           case 'attachAsLink':
+              this.modalTitle = this.props.attachAsLink;
+              this.displayShareLinkOptions = "block";
+              break;
         }
-        else{
-            window.parent.document.getElementById("shareLinkOptions").style.display = "none";
-        }
+
+        this.modal = (
+            <ModalDialog
+                class={style.modalDialog}
+                contentClass={style.modalContent}
+                innerClass={style.inner}
+                onClose={this.handleClose}
+                cancelButton={false}
+                header={false}
+                footer={false}
+            >
+                <div class="zimbra-client_modal-dialog_inner"><header class="zimbra-client_modal-dialog_header"><h2>{this.modalTitle}</h2><button onClick={this.handleClose} aria-label="Close" class="zimbra-client_close-button_close zimbra-client_modal-dialog_actionButton"><span role="img" class="zimbra-icon zimbra-icon-close blocks_icon_md"></span></button></header>
+                    <div class="zimbra-client_modal-dialog_content zimbra-client_language-modal_languageModalContent"><div style={{display:this.displayShareLinkOptions}}><div style="margin:5px;margin-bottom:15px"><input id="linkSharePassword" placeholder={this.props.shareLinkPassword} value=""></input> {this.props.expirationDate} : <input type="date" min={minDate} id="expirationDate" name="expirationDate"  value=""></input></div></div><div onClick={e => this.DAVItemListClick(e, editor, attachType)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll; max-height:400px"></div>
+                        <button type="button" onClick={this.handleClose} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button">OK</button>
+                    </div>
+                </div>
+            </ModalDialog>
+        );
+
+        const { dispatch } = this.zimletContext.store;
+        dispatch(this.zimletContext.zimletRedux.actions.zimlets.addModal({ id: 'attachFromNextcloudModal', modal: this.modal }));
+
         this.doPropFind("/");
+    }
+
+    handleClose = e => {
+        const { dispatch } = this.zimletContext.store;
+        dispatch(this.zimletContext.zimletRedux.actions.zimlets.addModal({ id: 'attachFromNextcloudModal' }));
     }
 
     doPropFind = (path) => {

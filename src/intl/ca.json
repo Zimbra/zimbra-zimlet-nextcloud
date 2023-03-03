@@ -19,6 +19,13 @@
 		"attachAsLink": "Adjunta com a enllaç",
 		"shareLinkPassword": "Contrasenya per a l'enllaç compartit",
 		"expirationDate": "Data de caducitat de l'enllaç compartit",
-		"plainTextShareLink": "Copieu i enganxeu l'enllaç per compartir al vostre correu electrònic"
-	}
+		"plainTextShareLink": "Copieu i enganxeu l'enllaç per compartir al vostre correu electrònic",
+		"attachFromNextcloud": "Attach from Nextcloud",
+		"attachedOK":"Document attached!",
+		"linkInserted":"Link inserted!"
+	},
+	"zimlet": {
+		"description": "Nextcloud integration for Zimbra",
+		"label": "Nextcloud"
+  }
 }

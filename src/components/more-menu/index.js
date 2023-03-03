@@ -113,14 +113,14 @@ export default class MoreMenu extends Component {
                             <tr><td>{this._props.folderCurrent}: </td><td style="width:80%"><input readonly class="zimbra-client_text-input_input" style="width:100%" id="nextcloudFolder"></input></td></tr>
                         </table>
                         <div onClick={this.DAVItemListClick} id="nextcloudPropfind" style="width:100%; padding-left:10px; max-height:500px; overflow-y: scroll; overflow-x:hidden"></div>
+                        <button type="button" onClick={this.handleSave} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button">OK</button>
                     </div>
-                    <footer class="zimbra-client_modal-dialog_footer" id="nextcloudDialogButtons"><button type="button" onClick={this.handleSave} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button">OK</button></footer>
                 </div>
             </ModalDialog>
         );
 
         const { dispatch } = this.zimletContext.store;
-        dispatch(this.zimletContext.zimletRedux.actions.zimlets.addModal({ id: 'addEventModal', modal: this.modal }));
+        dispatch(this.zimletContext.zimletRedux.actions.zimlets.addModal({ id: 'saveToNextcloudModal', modal: this.modal }));
         this.doPropFind("/");
     }
 
@@ -156,7 +156,7 @@ export default class MoreMenu extends Component {
 
     handleClose = e => {
         const { dispatch } = this.zimletContext.store;
-        dispatch(this.zimletContext.zimletRedux.actions.zimlets.addModal({ id: 'addEventModal' }));
+        dispatch(this.zimletContext.zimletRedux.actions.zimlets.addModal({ id: 'saveToNextcloudModal' }));
 
         //only available in attachment-single-action
         try {
