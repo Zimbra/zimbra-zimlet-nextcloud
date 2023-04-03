@@ -20,9 +20,9 @@
 		"shareLinkPassword": "Passwort für geteilten Link",
 		"expirationDate": "Ablaufdatum für geteilten Link",
 		"plainTextShareLink": "Geteilten Link kopieren und in Ihre Mail einfügen",
-		"attachFromNextcloud": "Anhängen von Nextcloud",
-		"attachedOK":"Dokument beigefügt!",
-		"linkInserted":"Link eingefügt!"
+		"attachFromNextcloud": "Aus Nextcloud anhängen",
+		"attachedOK": "Datei angehängt!",
+		"linkInserted": "Link eingefügt!"
 	},
 	"zimlet": {
 		"description": "Nextcloud integration for Zimbra",
