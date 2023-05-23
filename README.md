@@ -7,10 +7,6 @@ This Zimlet is in the official repos and can be installed via:
       yum install zimbra-zimlet-nextcloud
       apt install  zimbra-zimlet-nextcloud
 
-## Demo
-
-See: https://github.com/Zimbra/nextcloud-zimlet/releases/download/0.0.2/20200529.Nextcloud.Zimlet.Modern.mp4
-
 ## Install instructions
 
 See: https://zimbra.github.io/zimbra-9/adminguide.html#_setting_up_nextcloud
