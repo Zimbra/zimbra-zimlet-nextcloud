@@ -3,7 +3,7 @@
 SHELL=bash
 NAME = $(shell cat package.json | grep 'name":' | cut -c 12- | rev | cut -c 3- | rev)
 DESC = $(shell cat package.json | grep 'description":' | cut -c 19- | rev | cut -c 3- | rev)
-VERSION = $(shell cat package.json | grep 'version":' | cut -c 15- | rev | cut -c 3- | rev)
+ZIMBRA_ZIMLET_NEXTCLOUD_VERSION = 1.13.0
 WORKSPACE = pkg
 
 .PHONY: clean all
@@ -41,7 +41,7 @@ stage-zimlet-zip:
 zimbra-zimlet-pkg: download stage-zimlet-zip
 	../zm-pkg-tool/pkg-build.pl \
 		--out-type=binary \
-		--pkg-version=1.0.13.$(shell git log --pretty=format:%ct -1) \
+		--pkg-version=$(ZIMBRA_ZIMLET_NEXTCLOUD_VERSION).$(shell git log --pretty=format:%ct -1) \
 		--pkg-release=1 \
 		--pkg-name=$(NAME) \
 		--pkg-summary='$(DESC)' \
