@@ -26,7 +26,7 @@ download:
 	mkdir downloads
 	wget -O downloads/zm-nextcloud-extension.jar https://files.zimbra.com/downloads/nextcloud/9.0.0.p26/zm-nextcloud-extension.jar
 	wget -O downloads/zimbra-zimlet-nextcloud.zip https://files.zimbra.com/downloads/nextcloud/9.0.0.p33/zimbra-zimlet-nextcloud.zip
-	wget -O downloads/com_zimbra_nextcloud.zip https://files.zimbra.com/downloads/nextcloud/10.0.2/com_zimbra_nextcloud.zip
+	wget -O downloads/com_zimbra_nextcloud.zip https://files.zimbra.com/downloads/nextcloud/10.0.2/0.0.2/com_zimbra_nextcloud.zip
 
 create-zip:
 	npm install --no-audit
