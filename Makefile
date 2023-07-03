@@ -3,7 +3,7 @@
 SHELL=bash
 NAME = $(shell cat package.json | grep 'name":' | cut -c 12- | rev | cut -c 3- | rev)
 DESC = $(shell cat package.json | grep 'description":' | cut -c 19- | rev | cut -c 3- | rev)
-ZIMBRA_ZIMLET_NEXTCLOUD_VERSION = 1.13.0
+ZIMBRA_ZIMLET_NEXTCLOUD_VERSION = 1.0.13
 WORKSPACE = pkg
 
 .PHONY: clean all
