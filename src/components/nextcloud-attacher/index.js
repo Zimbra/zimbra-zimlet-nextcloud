@@ -5,6 +5,7 @@ import { ModalDialog, ActionMenuGroup, ActionMenuItem, NestedActionMenuItem } fr
 import style from './style';
 import { getOCSPath, getDAVPath, getName, getTimeDate, getSize, sanitizeFileName, getParentPath } from '../../utils';
 import RenderPropfind from '../render-propfind';
+import { Button } from '@zimbra-client/blocks';
 
 @withIntl()
 @withText({
@@ -156,7 +157,7 @@ export default class NextcloudAttacher extends Component {
             >
                 <div class="zimbra-client_modal-dialog_inner"><header class="zimbra-client_modal-dialog_header"><h2>{this.modalTitle}</h2><button onClick={this.handleClose} aria-label="Close" class="zimbra-client_close-button_close zimbra-client_modal-dialog_actionButton"><span role="img" class="zimbra-icon zimbra-icon-close blocks_icon_md"></span></button></header>
                     <div class="zimbra-client_modal-dialog_content zimbra-client_language-modal_languageModalContent"><div style={{display:this.displayShareLinkOptions}}><div style="margin:5px;margin-bottom:15px"><input id="linkSharePassword" placeholder={this.props.shareLinkPassword} value=""></input> {this.props.expirationDate} : <input type="date" min={minDate} id="expirationDate" name="expirationDate"  value=""></input></div></div><div onClick={e => this.DAVItemListClick(e, editor, attachType)} id="nextcloudPropfind" style="width:100%; padding-left:10px; overflow:scroll; max-height:400px"></div>
-                        <button type="button" onClick={this.handleClose} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button">OK</button>
+                        <Button onClick={this.handleClose} styleType="secondary" brand="primary">OK</Button>
                     </div>
                 </div>
             </ModalDialog>

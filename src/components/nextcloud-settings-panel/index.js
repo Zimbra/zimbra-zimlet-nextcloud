@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import { withIntl } from '../../enhancers';
 import style from './style.less';
 import { OAuthClient } from '@zimbra/oauth-client';
+import { Button } from '@zimbra-client/blocks';
 
 @withIntl()
 export default class NextcloudSettingsPanel extends Component {
@@ -54,7 +55,7 @@ export default class NextcloudSettingsPanel extends Component {
 						<Text id={'nextcloud-zimlet-modern.outro'} />
 					</p>
 					<p>
-						<button type="button" onClick={this.deactivate} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button"><Text id={'nextcloud-zimlet-modern.deactivateButton'} /></button>
+						<Button onClick={this.deactivate} styleType="secondary" brand="primary"><Text id={'nextcloud-zimlet-modern.deactivateButton'} /></Button>
 					</p>
 				</div>
 			);
@@ -72,8 +73,7 @@ export default class NextcloudSettingsPanel extends Component {
 						<Text id={'nextcloud-zimlet-modern.intro'} />
 					</p>
 					<p>
-						<button type="button" onClick={this.openPage('/service/extension/oauth2/authorize/nextcloud?type=noop')} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button"><Text id={'nextcloud-zimlet-modern.activateButton'} /></button>
-
+						<Button onClick={this.openPage('/service/extension/oauth2/authorize/nextcloud?type=noop')} styleType="secondary" brand="primary"><Text id={'nextcloud-zimlet-modern.activateButton'} /></Button>
 					</p>
 				</div>
 			);

@@ -5,6 +5,7 @@ import { ModalDialog, ActionMenuItem, NakedButton } from '@zimbra-client/compone
 import { withText } from 'preact-i18n';
 import { getDAVPath, getName, getTimeDate, getSize, sanitizeFileName, getParentPath } from '../../utils';
 import RenderPropfind from '../render-propfind';
+import { Button } from '@zimbra-client/blocks';
 
 @withIntl()
 @withText({
@@ -113,7 +114,7 @@ export default class MoreMenu extends Component {
                             <tr><td>{this._props.folderCurrent}: </td><td style="width:80%"><input readonly class="zimbra-client_text-input_input" style="width:100%" id="nextcloudFolder"></input></td></tr>
                         </table>
                         <div onClick={this.DAVItemListClick} id="nextcloudPropfind" style="width:100%; padding-left:10px; max-height:500px; overflow-y: scroll; overflow-x:hidden"></div>
-                        <button type="button" onClick={this.handleSave} class="blocks_button_button blocks_button_primary blocks_button_regular zimbra-client_sidebar-primary-button_button">OK</button>
+                        <Button onClick={this.handleSave} styleType="secondary" brand="primary">OK</Button>
                     </div>
                 </div>
             </ModalDialog>
@@ -176,7 +177,7 @@ export default class MoreMenu extends Component {
             <span class={style.appIcon}>
             </span>);
         if (this._props.emailData.slot == "attachment-single-action") {
-            return (<div class="zimbra-client_attachment-grid_buttonContainer"><button onClick={this.showDialog} type="button" class="blocks_button_button blocks_button_regular zimbra-client_attachment-grid_button">{childIcon}{this._props.title}</button></div>)
+            return (<div class="zimbra-client_attachment-grid_buttonContainer"><Button onClick={this.showDialog} styleType="secondary" brand="primary">{childIcon}{this._props.title}</Button></div>)
         }
         else {
             return (
