@@ -28,7 +28,7 @@ export default class MoreMenu extends Component {
         //zimlet slots have inconsistent prop names, we copy all props to _props and make them consistent
         this._props = this.props;
 
-        //A conversation is selected, take newest message
+        //A multiple messages are selected, take message where menu was invoked
         try {
            if(Array.isArray(this._props.emailData.messages))
            {
@@ -60,15 +60,24 @@ export default class MoreMenu extends Component {
     };
 
     handleSave = e => {
+
         this._props.emailData.nextcloudAction = "put";
         this._props.emailData.nextcloudPath = window.parent.document.getElementById('nextcloudFolder').value;
         this._props.emailData.nextcloudDAVPath = getDAVPath(this.zimletContext);
         this._props.emailData.nextcloudFilename = sanitizeFileName(window.parent.document.getElementById('nextcloudFileName').value);
 
+        //fixme to-do: Zimlet should not alter this._props.emailData as this is not a copy but a reference to the email object, which is used by parent Modern UI as well!
+        let emailData = this._props.emailData;
+        if(emailData.__typename == "Conversation")
+        {
+           console.log("Attachments are not saved separately when invoked from conversation view. Will be in EML.");
+           emailData.id = emailData.messagesMetaData[0].id;
+        }
+
         var request = new XMLHttpRequest();
         var url = '/service/extension/nextcloud';
         var formData = new FormData();
-        formData.append("jsondata", JSON.stringify(this._props.emailData));
+        formData.append("jsondata", JSON.stringify(emailData));
         request.open('POST', url);
         request.onreadystatechange = function (e) {
             if (request.readyState == 4) {

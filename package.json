@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "zimbra-zimlet-nextcloud",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "license": "Network Edition License",
   "description": "Nextcloud integration for Zimbra",
   "main": "build/index.js",
