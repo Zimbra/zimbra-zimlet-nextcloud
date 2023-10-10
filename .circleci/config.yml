@@ -56,6 +56,16 @@ jobs:
          - image: zimbra/zm-base-os:core-ubuntu
       <<: *checkout_job_steps
 
+   build_u22:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
+      <<: *build_job_steps
+
    build_u20:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
@@ -109,6 +119,11 @@ workflows:
          - checkout:
             requires:
               - build
+         - build_u22:
+            requires:
+               - checkout
+            context:
+               - docker-dev-registry
          - build_u20:
             requires:
                - checkout
@@ -128,6 +143,7 @@ workflows:
          - deploy_s3_hold:
             type: approval
             requires:
+               - build_u22
                - build_u20
                - build_u18
                - build_u16
