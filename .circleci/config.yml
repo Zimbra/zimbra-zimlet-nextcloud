@@ -87,6 +87,16 @@ jobs:
          - image: zimbra/zm-base-os:devcore-ubuntu-16.04
       <<: *build_job_steps
 
+   build_c9:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
+      <<: *build_job_steps
+
    build_c8:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
@@ -133,6 +143,11 @@ workflows:
          - build_u16:
             requires:
                - checkout
+         - build_c9:
+            requires:
+               - checkout
+            context:
+               - docker-dev-registry
          - build_c8:
             requires:
                - checkout
@@ -147,6 +162,7 @@ workflows:
                - build_u20
                - build_u18
                - build_u16
+               - build_c9
                - build_c8
                - build_c7
 
