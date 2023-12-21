@@ -53,7 +53,10 @@ jobs:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:core-ubuntu
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *checkout_job_steps
 
    build_u22:
@@ -70,21 +73,30 @@ jobs:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-20.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_u18:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-18.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_u16:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-16.04
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-16.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_c9:
@@ -101,21 +113,30 @@ jobs:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-centos-8
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    build_c7:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:devcore-centos-7
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-7
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *build_job_steps
 
    deploy_s3:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
       docker:
-         - image: zimbra/zm-base-os:core-ubuntu
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
       <<: *deploy_s3_job_steps
 
 ############################################################################
@@ -129,6 +150,8 @@ workflows:
          - checkout:
             requires:
               - build
+            context:
+               - docker-dev-registry
          - build_u22:
             requires:
                - checkout
@@ -137,12 +160,18 @@ workflows:
          - build_u20:
             requires:
                - checkout
+            context:
+               - docker-dev-registry
          - build_u18:
             requires:
                - checkout
+            context:
+               - docker-dev-registry
          - build_u16:
             requires:
                - checkout
+            context:
+               - docker-dev-registry
          - build_c9:
             requires:
                - checkout
@@ -151,9 +180,13 @@ workflows:
          - build_c8:
             requires:
                - checkout
+            context:
+               - docker-dev-registry
          - build_c7:
             requires:
                - checkout
+            context:
+               - docker-dev-registry
 
          - deploy_s3_hold:
             type: approval
@@ -169,5 +202,6 @@ workflows:
          - deploy_s3:
             context:
                - aws
+               - docker-dev-registry
             requires:
                - deploy_s3_hold
