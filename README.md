@@ -9,7 +9,7 @@ This Zimlet is in the official repos and can be installed via:
 
 ## Install instructions
 
-See: https://zimbra.github.io/zimbra-9/adminguide.html#_setting_up_nextcloud
+See: https://zimbra.github.io/documentation/zimbra-10/adminguide.html#_setting_up_nextcloud
 
 ## Owh no it is realllly slow
 
@@ -18,3 +18,7 @@ Check your bruteforce protection settings in Nextcloud and try a `truncate table
 ## Zimbra Nextcloud Java extension
 
 Nextcloud extension moved to it's own repo at: https://github.com/Zimbra/zm-nextcloud-extension
+
+## Classic UI Zimlet
+
+See: https://github.com/Zimbra/com_zimbra_nextcloud
