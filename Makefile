@@ -3,7 +3,7 @@
 SHELL=bash
 NAME = $(shell cat package.json | grep 'name":' | cut -c 12- | rev | cut -c 3- | rev)
 DESC = $(shell cat package.json | grep 'description":' | cut -c 19- | rev | cut -c 3- | rev)
-ZIMBRA_ZIMLET_NEXTCLOUD_VERSION = 1.0.15
+ZIMBRA_ZIMLET_NEXTCLOUD_VERSION = 1.0.16
 WORKSPACE = pkg
 
 .PHONY: clean all
@@ -24,7 +24,7 @@ all: zimbra-zimlet-pkg
 
 download:
 	mkdir downloads
-	wget -O downloads/zm-nextcloud-extension.jar https://files.zimbra.com/downloads/nextcloud/10.0.6/zm-nextcloud-extension.jar
+	wget -O downloads/zm-nextcloud-extension.jar https://files.zimbra.com/downloads/nextcloud/10.0.7/zm-nextcloud-extension.jar
 	wget -O downloads/zimbra-zimlet-nextcloud.zip https://files.zimbra.com/downloads/nextcloud/9.0.0.p34/zimbra-zimlet-nextcloud.zip
 	wget -O downloads/com_zimbra_nextcloud.zip https://files.zimbra.com/downloads/nextcloud/9.0.0.p34/com_zimbra_nextcloud.zip
 
