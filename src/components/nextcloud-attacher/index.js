@@ -97,7 +97,7 @@ export default class NextcloudAttacher extends Component {
                         }
                         else
                         {
-                           //https://github.com/ZimbraOS/zm-x-web/blob/1a6ae45704a6e189dd859a22ed802aac150c694d/src/components/composer/composer.js#L990
+                           //https://github.com/Zimbra/zm-x-web/blob/1a6ae45704a6e189dd859a22ed802aac150c694d/src/components/composer/composer.js#L990
                            //InsertAt... not supported in plain text compose mode
                            window.prompt(this.props.plainTextShareLink,OCSResponse.url);
                         }
