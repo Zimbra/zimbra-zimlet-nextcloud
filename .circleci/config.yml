@@ -54,6 +54,16 @@ jobs:
          - image: zimbra/zm-base-os:core-ubuntu
       <<: *checkout_job_steps
 
+   build_u24:
+      working_directory: ~/zimbra-zimlet-nextcloud
+      shell: /bin/bash -eo pipefail
+      docker:
+         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-24.04
+           auth:
+            username: $DOCKER_USER
+            password: $DOCKER_PASS
+      <<: *build_job_steps
+   
    build_u22:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
@@ -78,13 +88,6 @@ jobs:
          - image: zimbra/zm-base-os:devcore-ubuntu-18.04
       <<: *build_job_steps
 
-   build_u16:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: zimbra/zm-base-os:devcore-ubuntu-16.04
-      <<: *build_job_steps
-
    build_c9:
       working_directory: ~/zimbra-zimlet-nextcloud
       shell: /bin/bash -eo pipefail
@@ -100,13 +103,6 @@ jobs:
       shell: /bin/bash -eo pipefail
       docker:
          - image: zimbra/zm-base-os:devcore-centos-8
-      <<: *build_job_steps
-
-   build_c7:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: zimbra/zm-base-os:devcore-centos-7
       <<: *build_job_steps
 
    deploy_s3:
@@ -127,6 +123,11 @@ workflows:
          - checkout:
             requires:
               - build
+         - build_u24:
+            requires:
+               - checkout
+            context:
+               - docker-dev-registry
          - build_u22:
             requires:
                - checkout
@@ -138,9 +139,6 @@ workflows:
          - build_u18:
             requires:
                - checkout
-         - build_u16:
-            requires:
-               - checkout
          - build_c9:
             requires:
                - checkout
@@ -149,20 +147,16 @@ workflows:
          - build_c8:
             requires:
                - checkout
-         - build_c7:
-            requires:
-               - checkout
 
          - deploy_s3_hold:
             type: approval
             requires:
+               - build_u24
                - build_u22
                - build_u20
                - build_u18
-               - build_u16
                - build_c9
                - build_c8
-               - build_c7
 
          - deploy_s3:
             context:
