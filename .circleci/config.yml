@@ -40,8 +40,11 @@ references:
   # ---------------------------------------------------------------------------
   # develop-only build step (deb platforms)
   # Patches Makefile at build time:
-  #   --pkg-version  → <major>.<minor>.<micro>.<build_num>.<git_ts>
+  #   --pkg-version  → <major>.<minor>.<micro>.<git_ts>
   #   --pkg-release  → 1~develop-snapshot
+  #
+  # Produces:
+  #   zimbra-zimlet-nextcloud_10.1.18.1781774655-1~develop-snapshot.u22_amd64.deb
   # ---------------------------------------------------------------------------
   build_develop_deb: &build_develop_deb
     steps:
@@ -55,15 +58,14 @@ references:
             BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
             MAJOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f1)
             MINOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f2)
-            MICRO_TAG=$(echo "$BUILD_RELEASE_NUMBER"   | cut -d'.' -f3)
+            MICRO_TAG=$(echo "$BUILD_RELEASE_NUMBER"     | cut -d'.' -f3)
             GIT_TS=$(git log --pretty=format:%ct -1)
-            PKG_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_TAG}.${CIRCLE_BUILD_NUM}.${GIT_TS}"
+            PKG_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_TAG}.${GIT_TS}"
             PKG_RELEASE="1~develop-snapshot"
 
             echo "PKG_VERSION=${PKG_VERSION}  PKG_RELEASE=${PKG_RELEASE}"
 
             cp Makefile Makefile.orig
-            # Replace the hardcoded --pkg-version line
             sed -i "s|--pkg-version=.*|--pkg-version=${PKG_VERSION} \\\\|" Makefile
             sed -i "s|--pkg-release=1\b|--pkg-release=${PKG_RELEASE}|g" Makefile
 
@@ -83,6 +85,12 @@ references:
 
   # ---------------------------------------------------------------------------
   # develop-only build step (rpm platforms)
+  # Patches Makefile at build time:
+  #   --pkg-version  → <major>.<minor>.<micro>.<git_ts>
+  #   --pkg-release  → 1_develop_snapshot
+  #
+  # Produces:
+  #   zimbra-zimlet-nextcloud-10.1.18.1781774655-1_develop_snapshot.r9.x86_64.rpm
   # ---------------------------------------------------------------------------
   build_develop_rpm: &build_develop_rpm
     steps:
@@ -96,9 +104,9 @@ references:
             BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
             MAJOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f1)
             MINOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f2)
-            MICRO_TAG=$(echo "$BUILD_RELEASE_NUMBER"   | cut -d'.' -f3)
+            MICRO_TAG=$(echo "$BUILD_RELEASE_NUMBER"     | cut -d'.' -f3)
             GIT_TS=$(git log --pretty=format:%ct -1)
-            PKG_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_TAG}.${CIRCLE_BUILD_NUM}.${GIT_TS}"
+            PKG_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_TAG}.${GIT_TS}"
             PKG_RELEASE="1_develop_snapshot"
 
             echo "PKG_VERSION=${PKG_VERSION}  PKG_RELEASE=${PKG_RELEASE}"
@@ -122,7 +130,7 @@ references:
           paths: zimbra-zimlet-nextcloud/build/dist/*
 
   # ---------------------------------------------------------------------------
-  # publish_packages — fix: pass "build/dist" (relative to working_directory)
+  # publish_packages — uploads all build packages to Nexus (develop only)
   # ---------------------------------------------------------------------------
   publish_packages_job_steps: &publish_packages_job_steps
     steps:
@@ -148,7 +156,7 @@ jobs:
     resource_class: small
     <<: *checkout_steps
 
-  # ---- develop build jobs ----
+  # ---- develop build jobs (deb) ----
 
   develop_build_u24:
     working_directory: ~/zimbra-zimlet-nextcloud
@@ -194,6 +202,8 @@ jobs:
     resource_class: small
     <<: *build_develop_deb
 
+  # ---- develop build jobs (rpm) ----
+
   develop_build_c9:
     working_directory: ~/zimbra-zimlet-nextcloud
     shell: /bin/bash -eo pipefail
@@ -226,6 +236,8 @@ jobs:
           password: $DOCKER_PASS
     resource_class: small
     <<: *build_develop_rpm
+
+  # ---- publish ----
 
   publish_packages:
     working_directory: ~/zimbra-zimlet-nextcloud
@@ -323,6 +335,9 @@ jobs:
 workflows:
   version: 2
 
+  # -------------------------------------------------------------------------
+  # develop-workflow: auto-triggers on every push/merge to develop branch
+  # -------------------------------------------------------------------------
   develop-workflow:
     jobs:
       - checkout:
@@ -418,6 +433,9 @@ workflows:
             branches:
               only: poc
 
+  # -------------------------------------------------------------------------
+  # commit-workflow: all non-develop branches, approval-gated
+  # -------------------------------------------------------------------------
   commit-workflow:
     jobs:
       - build_zimlet:
