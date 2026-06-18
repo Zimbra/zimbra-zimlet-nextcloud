@@ -1,449 +1,499 @@
 version: 2.1
 
-############################################################################
-
 references:
-   checkout_job_steps: &checkout_job_steps
-      steps:
-         - checkout
-         - run:
-            name: Checking out dependencies
-            command: |
-               git clone https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
-               git clone -b master --single-branch \
-                  https://$GITHUB_ACCESS_TOKEN@github.com/Zimbra/zm-nexus.git ~/zm-nexus
-         - persist_to_workspace:
-            root: ..
-            paths:
-               - zimbra-zimlet-nextcloud
-               - zm-pkg-tool
-               - zm-nexus
+  checkout_steps: &checkout_steps
+    steps:
+      - checkout:
+          method: full
 
-   # ---------------------------------------------------------------------------
-   # Ubuntu build anchor
-   # ---------------------------------------------------------------------------
-   build_ubuntu_job_steps: &build_ubuntu_job_steps
-      steps:
-         - attach_workspace:
-            at: ..
-         - run:
-            name: Creating build
-            command: |
-               sudo apt-get update
+      - run:
+          name: Checking out dependencies..
+          command: |
+            git clone https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
+            git clone -b master --single-branch https://$GITHUB_ACCESS_TOKEN@github.com/Zimbra/zm-nexus.git ~/zm-nexus
+            echo "BUILD_NO=$CIRCLE_BUILD_NUM" > config.build
 
-               if [ "$CIRCLE_BRANCH" = "poc" ]; then
-                  # develop: patch Makefile to use develop-snapshot revision (deb format: ~)
-                  BUILDINFO_REVISION="1~develop-snapshot"
-               else
-                  BUILDINFO_REVISION="1"
-               fi
+      - persist_to_workspace:
+          root: ..
+          paths:
+            - zimbra-zimlet-nextcloud
+            - zm-pkg-tool
+            - zm-nexus
 
-               # Patch --pkg-release in Makefile to inject develop-snapshot revision
-               sed -i "s/--pkg-release=1/--pkg-release=${BUILDINFO_REVISION}/" Makefile
-               echo "Patched Makefile pkg-release:"
-               grep "\-\-pkg-release" Makefile
+  # ---- regular (non-develop) build ----
+  build_steps: &build_steps
+    steps:
+      - attach_workspace:
+          at: ..
 
-               make
-         - store_artifacts:
-            path: build/dist
-         - persist_to_workspace:
-            root: ..
-            paths:
-               - zimbra-zimlet-nextcloud/build/dist/*
+      - run:
+          name: Creating package
+          command: make zimbra-zimlet-pkg
 
-   # ---------------------------------------------------------------------------
-   # CentOS / RHEL build anchor
-   # ---------------------------------------------------------------------------
-   build_centos_job_steps: &build_centos_job_steps
-      steps:
-         - attach_workspace:
-            at: ..
-         - run:
-            name: Creating build
-            command: |
-               if [ "$CIRCLE_BRANCH" = "poc" ]; then
-                  # develop: patch Makefile to use develop-snapshot revision (rpm format: _)
-                  BUILDINFO_REVISION="1_develop_snapshot"
-               else
-                  BUILDINFO_REVISION="1"
-               fi
+      - store_artifacts:
+          path: build/dist
 
-               # Patch --pkg-release in Makefile to inject develop-snapshot revision
-               sed -i "s/--pkg-release=1/--pkg-release=${BUILDINFO_REVISION}/" Makefile
-               echo "Patched Makefile pkg-release:"
-               grep "\-\-pkg-release" Makefile
+      - persist_to_workspace:
+          root: ..
+          paths: zimbra-zimlet-nextcloud/build/dist/*
 
-               make
-         - store_artifacts:
-            path: build/dist
-         - persist_to_workspace:
-            root: ..
-            paths:
-               - zimbra-zimlet-nextcloud/build/dist/*
+  # ---------------------------------------------------------------------------
+  # develop-only build step (deb platforms)
+  # Patches Makefile at build time:
+  #   --pkg-version  → <major>.<minor>.<micro>.<build_num>.<git_ts>
+  #   --pkg-release  → 1~develop-snapshot
+  # ---------------------------------------------------------------------------
+  build_develop_deb: &build_develop_deb
+    steps:
+      - attach_workspace:
+          at: ..
 
-   deploy_s3_job_steps: &deploy_s3_job_steps
-      docker:
-         - image: 'cimg/python:3.10'
-      resource_class: small
-      steps:
-         - attach_workspace:
-            at: ..
-         - run:
-            name: Create a zip file for artifacts and upload them to the OCI bucket
-            command: |
-               cd build/dist/
-               zip -r $CIRCLE_PROJECT_REPONAME.zip .
-               ZIP_FILE_PATH="$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/$CIRCLE_BRANCH-$CIRCLE_BUILD_NUM/archives/$CIRCLE_PROJECT_REPONAME.zip"
-               curl -X PUT "$OCI_PAR_URL$ZIP_FILE_PATH" -T $CIRCLE_PROJECT_REPONAME.zip
-               echo "artifacts uploaded to $ZIP_FILE_PATH"
+      - run:
+          name: Creating develop-snapshot package (deb)
+          command: |
+            BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
+            BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
+            MAJOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f1)
+            MINOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f2)
+            MICRO_TAG=$(echo "$BUILD_RELEASE_NUMBER"   | cut -d'.' -f3)
+            GIT_TS=$(git log --pretty=format:%ct -1)
+            PKG_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_TAG}.${CIRCLE_BUILD_NUM}.${GIT_TS}"
+            PKG_RELEASE="1~develop-snapshot"
 
-   publish_packages_job_steps: &publish_packages_job_steps
-      steps:
-         - attach_workspace:
-            at: ..
-         - run:
-            name: Publish package artifacts to Nexus
-            command: |
-               sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
-               bash ../zm-nexus/scripts/publish-packages-to-nexus.sh "zimbra-zimlet-nextcloud/build/dist"
+            echo "PKG_VERSION=${PKG_VERSION}  PKG_RELEASE=${PKG_RELEASE}"
+
+            cp Makefile Makefile.orig
+            # Replace the hardcoded --pkg-version line
+            sed -i "s|--pkg-version=.*|--pkg-version=${PKG_VERSION} \\\\|" Makefile
+            sed -i "s|--pkg-release=1\b|--pkg-release=${PKG_RELEASE}|g" Makefile
+
+            echo "--- patched Makefile ---"
+            grep -E "pkg-version|pkg-release" Makefile
+
+            make zimbra-zimlet-pkg
+
+            mv Makefile.orig Makefile
+
+      - store_artifacts:
+          path: build/dist
+
+      - persist_to_workspace:
+          root: ..
+          paths: zimbra-zimlet-nextcloud/build/dist/*
+
+  # ---------------------------------------------------------------------------
+  # develop-only build step (rpm platforms)
+  # ---------------------------------------------------------------------------
+  build_develop_rpm: &build_develop_rpm
+    steps:
+      - attach_workspace:
+          at: ..
+
+      - run:
+          name: Creating develop-snapshot package (rpm)
+          command: |
+            BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NO%_}"
+            BUILD_RELEASE_NUMBER="${BUILD_RELEASE_NUMBER%_GA}"
+            MAJOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f1)
+            MINOR_VERSION=$(echo "$BUILD_RELEASE_NUMBER" | cut -d'.' -f2)
+            MICRO_TAG=$(echo "$BUILD_RELEASE_NUMBER"   | cut -d'.' -f3)
+            GIT_TS=$(git log --pretty=format:%ct -1)
+            PKG_VERSION="${MAJOR_VERSION}.${MINOR_VERSION}.${MICRO_TAG}.${CIRCLE_BUILD_NUM}.${GIT_TS}"
+            PKG_RELEASE="1_develop_snapshot"
+
+            echo "PKG_VERSION=${PKG_VERSION}  PKG_RELEASE=${PKG_RELEASE}"
+
+            cp Makefile Makefile.orig
+            sed -i "s|--pkg-version=.*|--pkg-version=${PKG_VERSION} \\\\|" Makefile
+            sed -i "s|--pkg-release=1\b|--pkg-release=${PKG_RELEASE}|g" Makefile
+
+            echo "--- patched Makefile ---"
+            grep -E "pkg-version|pkg-release" Makefile
+
+            make zimbra-zimlet-pkg
+
+            mv Makefile.orig Makefile
+
+      - store_artifacts:
+          path: build/dist
+
+      - persist_to_workspace:
+          root: ..
+          paths: zimbra-zimlet-nextcloud/build/dist/*
+
+  # ---------------------------------------------------------------------------
+  # publish_packages — fix: pass "build/dist" (relative to working_directory)
+  # ---------------------------------------------------------------------------
+  publish_packages_job_steps: &publish_packages_job_steps
+    steps:
+      - attach_workspace:
+          at: ..
+      - run:
+          name: Publish package artifacts to Nexus
+          command: |
+            sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl
+            bash ../zm-nexus/scripts/publish-packages-to-nexus.sh "build/dist"
 
 ############################################################################
 
 jobs:
-   checkout:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: small
-      <<: *checkout_job_steps
+  checkout:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *checkout_steps
 
-   build_u24:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-24.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_ubuntu_job_steps
+  # ---- develop build jobs ----
 
-   build_u22:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_ubuntu_job_steps
+  develop_build_u24:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-24.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_deb
 
-   build_u20:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_ubuntu_job_steps
+  develop_build_u22:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_deb
 
-   build_u18:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_ubuntu_job_steps
+  develop_build_u20:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_deb
 
-   build_u16:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-16.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_ubuntu_job_steps
+  develop_build_u18:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_deb
 
-   build_c9:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_centos_job_steps
+  develop_build_c9:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_rpm
 
-   build_c8:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_centos_job_steps
+  develop_build_c8:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_rpm
 
-   build_c7:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-7
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: medium
-      <<: *build_centos_job_steps
+  develop_build_c7:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-7
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_develop_rpm
 
-   deploy_s3:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      <<: *deploy_s3_job_steps
+  publish_packages:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    circleci_ip_ranges: true
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *publish_packages_job_steps
 
-   publish_packages:
-      working_directory: ~/zimbra-zimlet-nextcloud
-      shell: /bin/bash -eo pipefail
-      circleci_ip_ranges: true
-      docker:
-         - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
-           auth:
-             username: $DOCKER_USER
-             password: $DOCKER_PASS
-      resource_class: small
-      <<: *publish_packages_job_steps
+  # ---- non-develop (commit-workflow) build jobs ----
+
+  build_u24:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-24.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
+
+  build_u22:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
+
+  build_u20:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-20.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
+
+  build_u18:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-18.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
+
+  build_c9:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
+
+  build_c8:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-8
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
+
+  build_c7:
+    working_directory: ~/zimbra-zimlet-nextcloud
+    shell: /bin/bash -eo pipefail
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-centos-7
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    resource_class: small
+    <<: *build_steps
 
 ############################################################################
 
 workflows:
-   version: 2
+  version: 2
 
-   # -------------------------------------------------------------------------------
-   # develop branch: checkout → all builds → publish_packages to Nexus (no JAR)
-   # -------------------------------------------------------------------------------
-   develop-workflow:
-      jobs:
-         - checkout:
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+  develop-workflow:
+    jobs:
+      - checkout:
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              only: poc
 
-         - build_u24:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_u24:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_u22:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_u22:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_u20:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_u20:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_u18:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_u18:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_u16:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_c9:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_c9:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_c8:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_c8:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - develop_build_c7:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+            - build-info
+          filters:
+            branches:
+              only: poc
 
-         - build_c7:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                only: poc
+      - publish_packages:
+          context:
+            - docker-dev-registry
+            - nexus-dev-artifactory
+          requires:
+            - develop_build_u24
+            - develop_build_u22
+            - develop_build_u20
+            - develop_build_u18
+            - develop_build_c9
+            - develop_build_c8
+            - develop_build_c7
+          filters:
+            branches:
+              only: poc
 
-         - publish_packages:
-            context:
-               - docker-dev-registry
-               - nexus-dev-artifactory
-            requires:
-               - build_u24
-               - build_u22
-               - build_u20
-               - build_u18
-               - build_u16
-               - build_c9
-               - build_c8
-               - build_c7
-            filters:
-              branches:
-                only: poc
+  commit-workflow:
+    jobs:
+      - build_zimlet:
+          type: approval
+          filters:
+            branches:
+              ignore: poc
 
-   # -------------------------------------------------------------------------------
-   # non-develop branches: approval gate → checkout → all builds → deploy_s3
-   # -------------------------------------------------------------------------------
-   non-develop-workflow:
-      jobs:
-         - build:
-            type: approval
-            filters:
-              branches:
-                ignore: poc
+      - checkout:
+          requires:
+            - build_zimlet
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - checkout:
-            requires:
-               - build
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
+      - build_u24:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - build_u24:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
+      - build_u22:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - build_u22:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
+      - build_u20:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - build_u20:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
+      - build_u18:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - build_u18:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
+      - build_c9:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - build_u16:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
+      - build_c8:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
 
-         - build_c9:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
-
-         - build_c8:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
-
-         - build_c7:
-            requires:
-               - checkout
-            context:
-               - docker-dev-registry
-            filters:
-              branches:
-                ignore: poc
-
-         - deploy_s3_hold:
-            type: approval
-            requires:
-               - build_u24
-               - build_u22
-               - build_u20
-               - build_u18
-               - build_u16
-               - build_c9
-               - build_c8
-               - build_c7
-            filters:
-              branches:
-                ignore: poc
-
-         - deploy_s3:
-            context:
-               - oracle
-            requires:
-               - deploy_s3_hold
-            filters:
-              branches:
-                ignore: poc
+      - build_c7:
+          requires:
+            - checkout
+          context:
+            - docker-dev-registry
+          filters:
+            branches:
+              ignore: poc
