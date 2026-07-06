@@ -128,25 +128,34 @@ workflows:
                - checkout
             context:
                - docker-dev-registry
+               - oracle
          - build_u22:
             requires:
                - checkout
             context:
                - docker-dev-registry
+               - oracle
          - build_u20:
             requires:
                - checkout
+            context:
+               - oracle
          - build_u18:
             requires:
                - checkout
+            context:
+               - oracle
          - build_c9:
             requires:
                - checkout
             context:
                - docker-dev-registry
+               - oracle
          - build_c8:
             requires:
                - checkout
+            context:
+               - oracle
 
          - deploy_s3_hold:
             type: approval
