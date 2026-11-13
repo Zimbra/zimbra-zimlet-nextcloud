@@ -1,5 +1,5 @@
 import { createElement, Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text } from '@zimbra/preact-i18n';
 import { withIntl } from '../../enhancers';
 import style from './style.less';
 import { OAuthClient } from '@zimbra/oauth-client';
@@ -17,12 +17,10 @@ export default class NextcloudSettingsPanel extends Component {
 		oauthClient.getCredentials('nextcloud').then(credentials => {
 			if (credentials[0]) {
 				this.setState({ authorized: true });
-			}
-			else {
+			} else {
 				this.setState({ authorized: false });
 			}
 		});
-
 	}
 
 	deactivate = () => {
@@ -35,7 +33,7 @@ export default class NextcloudSettingsPanel extends Component {
 		oauthClient.removeCredentials('nextcloud').then(() => {
 			this.setState({ authorized: false });
 		});
-	}
+	};
 
 	openPage = url => () => {
 		window.open(url, '_blank', 'noopener');
@@ -46,7 +44,6 @@ export default class NextcloudSettingsPanel extends Component {
 			return (
 				<div style="margin-left:10px">
 					<h1 class={style.heading}>
-
 						<span>
 							<Text id={'nextcloud-zimlet-modern.title'} />
 						</span>
@@ -55,16 +52,16 @@ export default class NextcloudSettingsPanel extends Component {
 						<Text id={'nextcloud-zimlet-modern.outro'} />
 					</p>
 					<p>
-						<Button onClick={this.deactivate} styleType="secondary" brand="primary"><Text id={'nextcloud-zimlet-modern.deactivateButton'} /></Button>
+						<Button onClick={this.deactivate} styleType="secondary" brand="primary">
+							<Text id={'nextcloud-zimlet-modern.deactivateButton'} />
+						</Button>
 					</p>
 				</div>
 			);
-		}
-		else {
+		} else {
 			return (
 				<div style="margin-left:10px">
 					<h1 class={style.heading}>
-
 						<span>
 							<Text id={'nextcloud-zimlet-modern.title'} />
 						</span>
@@ -73,11 +70,16 @@ export default class NextcloudSettingsPanel extends Component {
 						<Text id={'nextcloud-zimlet-modern.intro'} />
 					</p>
 					<p>
-						<Button onClick={this.openPage('/service/extension/oauth2/authorize/nextcloud?type=noop')} styleType="secondary" brand="primary"><Text id={'nextcloud-zimlet-modern.activateButton'} /></Button>
+						<Button
+							onClick={this.openPage('/service/extension/oauth2/authorize/nextcloud?type=noop')}
+							styleType="secondary"
+							brand="primary"
+						>
+							<Text id={'nextcloud-zimlet-modern.activateButton'} />
+						</Button>
 					</p>
 				</div>
 			);
 		}
-
 	}
 }
