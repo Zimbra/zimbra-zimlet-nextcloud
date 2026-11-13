@@ -8,9 +8,8 @@ import { withIntlWrapper } from '@zimbra-client/enhancers';
  * @param {Boolean} showLoader Show loader on container or not
  *
  */
-export const withIntl = () => withIntlWrapper(
-    {
-        importFn: locale => import(/* webpackMode: "eager" */`./intl/${locale}.json`),
-        showLoader: false
-    }
-);
+export const withIntl = () =>
+	withIntlWrapper({
+		importFn: locale => import(/* webpackMode: "eager" */ `./intl/${locale}.json`),
+		showLoader: false
+	});

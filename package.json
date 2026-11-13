@@ -10,9 +10,9 @@
     "build": "zimlet build && cp .netlify/* build",
     "watch": "zimlet watch",
     "start": "zimlet watch",
-    "package": "zimlet package --name $npm_package_name --description $npm_package_description --pkg-version $npm_package_version --zimbraXVersion '^2.0.0'",
+    "package": "zimlet package --name $npm_package_name --description $npm_package_description --pkg-version $npm_package_version --zimbraXVersion '^4.25.0'",
     "preinstall": "git config --global url.\"https://${GITHUB_ACCESS_TOKEN}:@github.com/\".insteadof \"https://github.com/\"",
-    "lint": "eslint src",
+    "lint": "eslint --cache --config eslint.config.mjs src",
     "lint:fix": "npm run lint -- --fix",
     "security:audit": "audit-ci --moderate --report"
   },
@@ -22,22 +22,20 @@
     "Zimbra"
   ],
   "author": "",
-  "eslintConfig": {
-    "extends": "eslint-config-synacor"
-  },
   "devDependencies": {
-    "@zimbra/zimlet-cli": "^14.0.0",
-    "audit-ci": "^6.1.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-config-synacor": "^3.0.5",
-    "eslint-plugin-preact-i18n": "^1.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "prettier-eslint": "^13.0.0"
+    "@zimbra/eslint-config": "^3.0.0",
+    "eslint": "^9.39.4",
+    "@zimbra/zimlet-cli": "^19.0.0",
+    "audit-ci": "^6.1.0"
   },
   "dependencies": {
-    "@zimbra/x-ui": "^2.2.0",
-    "@zimbra/oauth-client": "git+https://github.com/Zimbra/zm-x-oauth-client#nextcloud"
+    "@zimbra/x-ui": "^13.2.0",
+    "@zimbra/oauth-client": "git+ssh://git@github.com/Zimbra/zm-x-oauth-client.git#2.0.0",
+    "ajv": "^8.0.0"
+  },
+  "overrides": {
+    "@eslint/eslintrc": {
+      "ajv": "^6.12.6"
+    }
   }
 }
