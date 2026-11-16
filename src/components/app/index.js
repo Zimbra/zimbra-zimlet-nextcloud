@@ -1,4 +1,4 @@
-import { createElement, Component, render } from 'preact';
+import { createElement, Component } from 'preact';
 import style from './style';
 
 export default class App extends Component {

@@ -1,18 +1,12 @@
 import { createElement, Component, render } from 'preact';
 import { withIntl } from '../../enhancers';
 import style from './style';
-import { ModalDialog, ActionMenuItem, NakedButton } from '@zimbra-client/components';
+import { ModalDialog, ActionMenuItem } from '@zimbra-client/components';
 import { withText } from '@zimbra/preact-i18n';
-import {
-	getDAVPath,
-	getName,
-	getTimeDate,
-	getSize,
-	sanitizeFileName,
-	getParentPath
-} from '../../utils';
+import { getDAVPath, sanitizeFileName } from '../../utils';
 import RenderPropfind from '../render-propfind';
-import { Button } from '@zimbra-client/blocks';
+import { Button, Icon } from '@zimbra-client/blocks';
+import { XIcon } from 'lucide-preact';
 
 @withIntl()
 @withText({
@@ -74,7 +68,7 @@ export default class MoreMenu extends Component {
 
 		//fixme to-do: Zimlet should not alter this._props.emailData as this is not a copy but a reference to the email object, which is used by parent Modern UI as well!
 		let emailData = this._props.emailData;
-		if (emailData.__typename == 'Conversation') {
+		if (emailData.__typename === 'Conversation') {
 			console.log(
 				'Attachments are not saved separately when invoked from conversation view. Will be in EML.'
 			);
@@ -87,8 +81,8 @@ export default class MoreMenu extends Component {
 		formData.append('jsondata', JSON.stringify(emailData));
 		request.open('POST', url);
 		request.onreadystatechange = function (e) {
-			if (request.readyState == 4) {
-				if (request.status == 200) {
+			if (request.readyState === 4) {
+				if (request.status === 200) {
 					this.alert(this._props.SavedOK);
 					this.handleClose();
 				} else {
@@ -108,7 +102,7 @@ export default class MoreMenu extends Component {
 		let filename = '';
 		let readonly = false;
 		filename = sanitizeFileName(this._props.emailData.subject) || this._props.emailData.id;
-		if (this._props.emailData.slot == 'attachment-single-action') {
+		if (this._props.emailData.slot === 'attachment-single-action') {
 			readonly = true;
 		}
 
@@ -130,7 +124,7 @@ export default class MoreMenu extends Component {
 							aria-label="Close"
 							class="zimbra-client_close-button_close zimbra-client_modal-dialog_actionButton"
 						>
-							<span role="img" class="zimbra-icon zimbra-icon-close blocks_icon_md"></span>
+							<Icon name={XIcon} size="md" />
 						</button>
 					</header>
 					<div class="zimbra-client_modal-dialog_content zimbra-client_language-modal_languageModalContent">
@@ -193,8 +187,8 @@ export default class MoreMenu extends Component {
 		formData.append('jsondata', JSON.stringify(this._props.emailData));
 		request.open('POST', url);
 		request.onreadystatechange = function (e) {
-			if (request.readyState == 4) {
-				if (request.status == 200) {
+			if (request.readyState === 4) {
+				if (request.status === 200) {
 					const propfindResponse = JSON.parse(request.responseText);
 					const renderedPropFind = RenderPropfind({
 						files: propfindResponse,
@@ -219,9 +213,7 @@ export default class MoreMenu extends Component {
 
 	handleClose = e => {
 		const { dispatch, zimletRedux } = this.zimletContext.store;
-		dispatch(
-			zimletRedux.actions.zimlets.addModal({ id: 'saveToNextcloudModal' })
-		);
+		dispatch(zimletRedux.actions.zimlets.addModal({ id: 'saveToNextcloudModal' }));
 
 		//only available in attachment-single-action
 		try {
@@ -240,7 +232,7 @@ export default class MoreMenu extends Component {
 
 	render() {
 		const childIcon = <span class={style.appIcon}></span>;
-		if (this._props.emailData.slot == 'attachment-single-action') {
+		if (this._props.emailData.slot === 'attachment-single-action') {
 			return (
 				<div class="zimbra-client_attachment-grid_buttonContainer">
 					<Button onClick={this.showDialog} styleType="secondary" brand="primary">
@@ -252,8 +244,8 @@ export default class MoreMenu extends Component {
 		} else {
 			return (
 				<div>
-					<ActionMenuItem icon={childIcon} onClick={this.showDialog}>
-						{this._props.title}
+					<ActionMenuItem onClick={this.showDialog}>
+						{childIcon} {this._props.title}
 					</ActionMenuItem>
 				</div>
 			);

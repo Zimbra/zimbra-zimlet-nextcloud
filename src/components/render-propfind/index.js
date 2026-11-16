@@ -1,13 +1,6 @@
-import { createElement, Component } from 'preact';
+import { createElement } from 'preact';
 import style from './style';
-import {
-	getName,
-	getTimeDate,
-	getSize,
-	sanitizeFileName,
-	getParentPath,
-	shortName
-} from '../../utils';
+import { getName, getTimeDate, getSize, getParentPath, shortName } from '../../utils';
 
 const RenderPropfind = props => {
 	//map is a for-each iterator es6 equivalent
