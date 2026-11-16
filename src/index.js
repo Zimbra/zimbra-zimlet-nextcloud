@@ -1,5 +1,5 @@
 //Load components from Zimbra
-import { createElement, Component, render } from 'preact';
+import { createElement } from 'preact';
 import { OAuthClient } from '@zimbra/oauth-client';
 import App from './components/app';
 import { MenuItem } from '@zimbra-client/components';
@@ -10,8 +10,7 @@ import { Text } from '@zimbra/preact-i18n';
 import createMore from './components/more';
 import createAttacher from './components/create-attacher';
 import NextcloudSettingsPanel from './components/nextcloud-settings-panel';
-
-// import style from './style';
+import style from './style.less';
 
 export default function Zimlet(context) {
 	//Get the 'plugins' object from context and define it in the current scope
@@ -59,10 +58,10 @@ export default function Zimlet(context) {
 
 		// Create a main nav menu item.
 		const CustomTabItemInner = () => {
-			const childIcon = <span class="zimbra-icon-nextcloud"></span>;
+			const childIcon = <span className="zimbra-icon-nextcloud"></span>;
 			return (
-				<MenuItem icon={childIcon} responsive href={`/cloudapps/ncauthorize`}>
-					Nextcloud
+				<MenuItem responsive href={`/cloudapps/ncauthorize`}>
+					{childIcon} Nextcloud
 				</MenuItem>
 			);
 		};
