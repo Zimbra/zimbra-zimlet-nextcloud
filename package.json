@@ -10,11 +10,10 @@
     "build": "zimlet build && cp .netlify/* build",
     "watch": "zimlet watch",
     "start": "zimlet watch",
-    "package": "zimlet package --name $npm_package_name --description $npm_package_description --pkg-version $npm_package_version --zimbraXVersion '^4.25.0'",
+    "package": "zimlet package --name $npm_package_name --description $npm_package_description --pkg-version $npm_package_version --zimbraXVersion '^5.0.0'",
     "preinstall": "git config --global url.\"https://${GITHUB_ACCESS_TOKEN}:@github.com/\".insteadof \"https://github.com/\"",
     "lint": "eslint --cache --config eslint.config.mjs src",
-    "lint:fix": "npm run lint -- --fix",
-    "security:audit": "audit-ci --moderate --report"
+    "lint:fix": "npm run lint -- --fix"
   },
   "keywords": [
     "zimlet",
@@ -25,8 +24,7 @@
   "devDependencies": {
     "@zimbra/eslint-config": "^3.0.0",
     "eslint": "^9.39.4",
-    "@zimbra/zimlet-cli": "^20.0.0",
-    "audit-ci": "^6.1.0"
+    "@zimbra/zimlet-cli": "^20.0.0"
   },
   "dependencies": {
     "@zimbra/x-ui": "^13.2.0",
